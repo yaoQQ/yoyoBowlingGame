@@ -1,0 +1,44 @@
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.UI;
+
+public class UIExEventTest : MonoBehaviour
+{
+
+    public AnimatorWidget a1;
+    public AnimatorWidget a2;
+    public ButtonWidget btn;
+
+    void OnEnable()
+    {
+        a1.AddEndAnimationEvent("packet_elastic", (str) => {
+            a2.Play("open_btn_elastic");
+        });
+        a2.AddEndAnimationEvent("open_btn_open", (str) => {
+            a1.Play("packet_open");
+        });
+        a1.AddEndAnimationEvent("packet_open", (str) => {
+            Debug.Log("发送请求");
+        });
+        a1.Play("packet_idle");
+        a1.Play("packet_elastic");
+
+    }
+    void OnDisable()
+    {
+        a1.ResetEvents();
+        a2.ResetEvents();
+    }
+    void Start()
+    {
+
+        btn.AddEventListener(UIEvent.PointerClick, (eventData) => {
+            a2.Play("open_btn_open");
+        });
+
+    }
+
+}

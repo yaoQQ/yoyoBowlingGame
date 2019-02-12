@@ -1,0 +1,35 @@
+local PanelWidget=CS.PanelWidget
+local ImageWidget=CS.ImageWidget
+local TextWidget=CS.TextWidget
+local ButtonWidget=CS.ButtonWidget
+
+Mid_platform_redbag_pase_panel={}
+local this = Mid_platform_redbag_pase_panel
+
+function this:new(gameObject)
+	local o = { }
+	setmetatable(o, self)
+	self.__index = self
+	o:init(gameObject)
+	return o
+end
+
+this.go = nil
+this.platform_redbag_pase_panel=nil
+this.mask_Image=nil
+this.dis_Text=nil
+this.left_Button=nil
+this.right_Button=nil
+this.number_Text=nil
+
+function this:init(gameObject)
+	self.go=gameObject
+	self.platform_redbag_pase_panel=self.go.transform:Find(""):GetComponent(typeof(PanelWidget))
+	self.mask_Image=self.go.transform:Find("mask_Image"):GetComponent(typeof(ImageWidget))
+	self.dis_Text=self.go.transform:Find("dis_Text"):GetComponent(typeof(TextWidget))
+	self.left_Button=self.go.transform:Find("left_Button"):GetComponent(typeof(ButtonWidget))
+	self.right_Button=self.go.transform:Find("right_Button"):GetComponent(typeof(ButtonWidget))
+	self.number_Text=self.go.transform:Find("right_Button/number_Text"):GetComponent(typeof(TextWidget))
+end
+
+

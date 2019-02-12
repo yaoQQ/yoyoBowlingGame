@@ -1,0 +1,323 @@
+﻿using UnityEngine;
+using System;
+using UnityEngine.EventSystems;
+using System.Collections.Generic;
+using UnityEngine.UI;
+#if !TOOL
+using XLua;
+
+[LuaCallCSharp]
+#endif
+public class CellGroupWidget : UIBaseWidget
+{
+    public override bool AddEventListener(UIEvent eventType, Action<PointerEventData> onEventHandler)
+    {
+        switch (eventType)
+        {
+            case UIEvent.PointerClick:
+                PointerClickListener.Get(gameObject).onHandler = onEventHandler;
+                break;
+            default:
+                break;
+        }
+        return false;
+    }
+    public override bool RemoveEventListener(UIEvent eventType, Action<PointerEventData> onEventHandler)
+    {
+        switch (eventType)
+        {
+            case UIEvent.PointerClick:
+                PointerClickListener.Get(gameObject).onHandler = null;
+                break;
+            default:
+                break;
+        }
+        return false;
+    }
+
+    public override bool AddCustomEventListener(UICustomEvent eventType, Action<object> onEventHandler)
+    {
+        return false;
+    }
+
+    public override bool AddMoreCustomEventListener(UIEvent eventType, Action<List<object>> onEventHandler)
+    {
+        bool sign = true;
+        switch (eventType)
+        {
+            case UIEvent.PointerDown:
+                cellPointerDownHandler = onEventHandler;
+                break;
+            case UIEvent.PointerUp:
+                cellPointerUpHandler = onEventHandler;
+                break;
+            case UIEvent.Drag:
+                cellDragHandler = onEventHandler;
+                break;               
+        }
+        return sign;    
+    }
+
+
+    public void SetCellData(List<object> p_dataList, Action<GameObject, object, int> p_onUpdateCellData)
+    {
+        if (p_dataList == null)
+        {
+            Debug.LogError("p_dataList为null");
+            return;
+        }
+        //如果数据超过了格子的数量，则把后面的数据删掉
+        List<object> temp = new List<object>();
+        if (p_dataList.Count > cellItemArr.Length)
+        {
+            for (int j = 0; j < cellItemArr.Length; j++)
+            {
+                temp.Add(p_dataList[j]);
+            }
+        }
+        else
+        {
+            temp = p_dataList;
+        }
+        
+        int i;
+        for (i = 0; i < temp.Count; i++)
+        {
+            p_onUpdateCellData(cellItemArr[i].gameObject, temp[i], i);
+            cellItemArr[i].gameObject.SetActive(true);
+        }
+        
+        while(i < cellItemArr.Length)
+        {
+            cellItemArr[i].gameObject.SetActive(false);
+            i++;
+        }
+    }
+
+    public override WidgetType GetWidgetType()
+    {
+        return WidgetType.CellGroup;
+    }
+
+    public string cellItemName;
+    public CellItemWidget[] cellItemArr;
+    private RectTransform rectTrans;
+    private CellItemWidget pressDownItem;
+
+    bool ispressDown = false;
+    bool isDrag = false;
+
+    Action<object> cellPointerClickHandler;
+    Action<List<object>> cellPointerUpHandler;
+    //Action<List<object>> cellPointerEnterHandler;
+    Action<List<object>> cellPointerDownHandler;
+    Action<List<object>> cellBeginDragHandler;
+    Action<List<object>> cellDragHandler;
+
+    void Awake()
+    {
+        for (int i = 0; i < cellItemArr.Length; i++)
+        {
+            CellItemWidget cell = cellItemArr[i];           
+            cell.index = i+1;
+        }
+
+        rectTrans = transform.GetComponent<RectTransform>();
+        //InitEvent();
+
+    }
+    void InitEvent()
+    {
+        PointerDownListener.Get(gameObject).onHandler = OnCellPointerDown;
+        PointerUpListener.Get(gameObject).onHandler = OnCellPointerUp;
+        DragEventHandler.Get(gameObject).onBeginDragHandler = OnCellBeginDrage;
+        DragEventHandler.Get(gameObject).onDragHandler = OnCellDrag;
+        for (int i = 0; i < cellItemArr.Length; i++)
+        {
+            CellItemWidget cell = cellItemArr[i];
+            PointerClickListener.Get(cell.gameObject).onHandler = OnCellPointerClick;
+        }
+      
+    }
+
+    void OnCellPointerClick(PointerEventData eventData)
+    {
+        if (cellPointerClickHandler != null && !isDrag)
+        {
+            CellItemWidget cell = eventData.pointerEnter.GetComponentInParent<CellItemWidget>();            
+            cellPointerClickHandler(cell.index);            
+        }
+    }
+
+    float startx = 0;
+    float endx = 0;
+
+    List<object> list = new List<object>();
+
+    void OnCellBeginDrage(PointerEventData eventData)
+    {
+        isDrag = true;           
+    }
+    
+    void OnCellDrag(PointerEventData eventData)
+    {
+        if(cellDragHandler != null)
+        {
+            Vector2 vec;
+            if (RectTransformUtility.ScreenPointToLocalPointInRectangle(rectTrans, eventData.position, eventData.pressEventCamera, out vec))
+            {
+                endx = vec.x;
+
+                List<object> tempList = new List<object>();
+                for (int i = 0; i < cellItemArr.Length; i++)
+                {
+                    Transform item = cellItemArr[i].transform;
+                    if (checkSelect(item, startx, endx))
+                    {
+                        Image img = cellItemArr[i].GetComponentInChildren<Image>();
+                        if (img != null)
+                        {
+                            tempList.Add(img);
+                        }
+
+                        if (!list.Contains(cellItemArr[i]))
+                        {
+                            list.Add(cellItemArr[i]);
+                        }                       
+                    }
+                    else
+                    {
+                        if (list.Contains(cellItemArr[i]))
+                        {
+                            if(pressDownItem != null)
+                            {
+                               if(cellItemArr[i].index != pressDownItem.index)
+                                {
+                                    list.Remove(cellItemArr[i]);
+                                }
+                            }
+                            else
+                            {
+                                list.Remove(cellItemArr[i]);
+                            }                          
+                        }
+                    }
+                }                
+
+                if (tempList.Count > 0)
+                {
+                    cellDragHandler(tempList);
+                }
+            }
+        }
+       
+    }
+
+    void OnCellPointerDown(PointerEventData eventData)
+    {
+        ispressDown = true;
+        list.Clear();
+        Vector2 vec;
+        if (RectTransformUtility.ScreenPointToLocalPointInRectangle(rectTrans, eventData.position, eventData.pressEventCamera, out vec))
+        {
+            startx = vec.x;
+        }
+
+        if (cellPointerDownHandler != null && !isDrag)
+        {
+            if (eventData.pointerEnter != null)
+            {
+                CellItemWidget cell = eventData.pointerEnter.GetComponentInParent<CellItemWidget>();
+                pressDownItem = cell;
+                list.Add(cell);
+                cellPointerDownHandler(list);
+            }
+            else if (eventData.pointerPress != null)
+            {
+                CellItemWidget cell = eventData.pointerPress.GetComponentInParent<CellItemWidget>();
+                pressDownItem = cell;
+                list.Add(cell);
+                cellPointerDownHandler(list);
+            }
+        }
+    }
+
+    void OnCellPointerUp(PointerEventData eventData)
+    {
+        if (cellPointerUpHandler != null)
+        {
+            for(int i = 0;i < cellItemArr.Length;i++)
+            {
+                CellItemWidget item = cellItemArr[i];
+                item.GetComponentInChildren<Image>().color = Color.white;
+            }
+            isDrag = false;
+            ispressDown = false;
+            List<object> tempList = new List<object>();
+            for(int i = 0; i < list.Count; i++)
+            {
+                CellItemWidget item = (CellItemWidget)list[i];
+                if (!tempList.Contains(item.index))
+                {
+                    tempList.Add(item.index);
+                }                
+            }
+            if(tempList.Count > 0)
+            {
+                cellPointerUpHandler(tempList);
+            }
+           
+        }
+
+    }
+
+    bool checkSelect(Transform trans, float startX, float endX)
+    {
+        float tempstartx = 0;
+        float tempendx = 0;
+        if(startX > endX)
+        {
+            tempstartx = endX;
+            tempendx = startX;
+        }
+        else
+        {
+            tempstartx = startX;
+            tempendx = endX;
+        }
+        Vector3 vec = trans.localPosition;
+        if (vec.x > tempstartx && vec.x < tempendx)
+        {
+            return true;
+        }
+        return false;
+            
+
+
+    }
+
+    void OnCellPointerEnter(PointerEventData eventData)
+    {
+       
+    }
+
+    public void setWidth(float width)
+    {
+        if(rectTrans != null)
+        {
+            float y = rectTrans.sizeDelta.y;
+            rectTrans.sizeDelta = new Vector2(width, y);
+        }
+    }
+
+
+    void OnDestroy()
+    {
+        cellPointerClickHandler = null;
+        cellPointerUpHandler = null;
+        //cellPointerEnterHandler = null;
+        cellPointerDownHandler = null;
+        cellDragHandler = null;
+
+    }
+}

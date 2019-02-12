@@ -1,0 +1,69 @@
+local IconWidget=CS.IconWidget
+local TextWidget=CS.TextWidget
+local ButtonWidget=CS.ButtonWidget
+local ImageWidget=CS.ImageWidget
+
+Mid_platform_global_panel={}
+local this = Mid_platform_global_panel
+
+function this:new(gameObject)
+	local o = { }
+	setmetatable(o, self)
+	self.__index = self
+	o:init(gameObject)
+	return o
+end
+
+this.go = nil
+this.bottom_personage_Icon=nil
+this.bottom_personage_Text=nil
+this.btn_personage=nil
+this.bottom_redbag_Icon=nil
+this.bottom_redbag_Text=nil
+this.btn_redbag=nil
+this.redbag_rp_image=nil
+this.bottom_business_Icon=nil
+this.bottom_business_Text=nil
+this.btn_business=nil
+this.bottom_chat_icon=nil
+this.bottom_chat_text=nil
+this.btn_chat=nil
+this.chat_rp_Image=nil
+this.chat_rp_Text=nil
+this.bottom_game_Icon=nil
+this.bottom_game_Text=nil
+this.btn_game=nil
+this.bottom_friend_Icon=nil
+this.bottom_friend_Text=nil
+this.btn_friend=nil
+this.personage_rp_Image=nil
+this.personage_rp_Text=nil
+
+function this:init(gameObject)
+	self.go=gameObject
+	self.bottom_personage_Icon=self.go.transform:Find("bottom/bottom_personage_Icon"):GetComponent(typeof(IconWidget))
+	self.bottom_personage_Text=self.go.transform:Find("bottom/bottom_personage_Icon/bottom_personage_Text"):GetComponent(typeof(TextWidget))
+	self.btn_personage=self.go.transform:Find("bottom/bottom_personage_Icon/btn_personage"):GetComponent(typeof(ButtonWidget))
+	self.bottom_redbag_Icon=self.go.transform:Find("bottom/bottom_redbag_Icon"):GetComponent(typeof(IconWidget))
+	self.bottom_redbag_Text=self.go.transform:Find("bottom/bottom_redbag_Icon/bottom_redbag_Text"):GetComponent(typeof(TextWidget))
+	self.btn_redbag=self.go.transform:Find("bottom/bottom_redbag_Icon/btn_redbag"):GetComponent(typeof(ButtonWidget))
+	self.redbag_rp_image=self.go.transform:Find("bottom/bottom_redbag_Icon/redbag_rp_image"):GetComponent(typeof(ImageWidget))
+	self.bottom_business_Icon=self.go.transform:Find("bottom/bottom_business_Icon"):GetComponent(typeof(IconWidget))
+	self.bottom_business_Text=self.go.transform:Find("bottom/bottom_business_Icon/bottom_business_Text"):GetComponent(typeof(TextWidget))
+	self.btn_business=self.go.transform:Find("bottom/bottom_business_Icon/btn_business"):GetComponent(typeof(ButtonWidget))
+	self.bottom_chat_icon=self.go.transform:Find("bottom/bottom_chat_icon"):GetComponent(typeof(IconWidget))
+	self.bottom_chat_text=self.go.transform:Find("bottom/bottom_chat_icon/bottom_chat_text"):GetComponent(typeof(TextWidget))
+	self.btn_chat=self.go.transform:Find("bottom/bottom_chat_icon/btn_chat"):GetComponent(typeof(ButtonWidget))
+	self.chat_rp_Image=self.go.transform:Find("bottom/bottom_chat_icon/chat_rp_Image"):GetComponent(typeof(ImageWidget))
+	self.chat_rp_Text=self.go.transform:Find("bottom/bottom_chat_icon/chat_rp_Image/chat_rp_Text"):GetComponent(typeof(TextWidget))
+	self.bottom_game_Icon=self.go.transform:Find("bottom/bottom_game_Icon"):GetComponent(typeof(IconWidget))
+	self.bottom_game_Text=self.go.transform:Find("bottom/bottom_game_Icon/bottom_game_Text"):GetComponent(typeof(TextWidget))
+	self.btn_game=self.go.transform:Find("bottom/bottom_game_Icon/btn_game"):GetComponent(typeof(ButtonWidget))
+	self.bottom_friend_Icon=self.go.transform:Find("bottom/bottom_friend_Icon"):GetComponent(typeof(IconWidget))
+	self.bottom_friend_Text=self.go.transform:Find("bottom/bottom_friend_Icon/bottom_friend_Text"):GetComponent(typeof(TextWidget))
+	self.btn_friend=self.go.transform:Find("bottom/bottom_friend_Icon/btn_friend"):GetComponent(typeof(ButtonWidget))
+	self.personage_rp_Image=self.go.transform:Find("bottom/bottom_friend_Icon/personage_rp_Image"):GetComponent(typeof(ImageWidget))
+	self.personage_rp_Text=self.go.transform:Find("bottom/bottom_friend_Icon/personage_rp_Image/personage_rp_Text"):GetComponent(typeof(TextWidget))
+end
+
+

@@ -1,0 +1,69 @@
+﻿local PanelWidget=CS.PanelWidget
+local CellRecycleScrollWidget=CS.CellRecycleScrollWidget
+local TextWidget=CS.TextWidget
+local InputFieldWidget=CS.InputFieldWidget
+local ImageWidget=CS.ImageWidget
+local ButtonWidget=CS.ButtonWidget
+local CircleImageWidget=CS.CircleImageWidget
+local IconWidget=CS.IconWidget
+
+Mid_platform_friend_search_panel={}
+local this = Mid_platform_friend_search_panel
+
+function this:new(gameObject)
+	local o = { }
+	setmetatable(o, self)
+	self.__index = self
+	o:init(gameObject)
+	return o
+end
+
+this.go = nil
+this.search_panel=nil
+this.search_CellRecycleScrollPanel=nil
+this.search_Text=nil
+this.search_InputField=nil
+this.clear_Image=nil
+this.cancel_Button=nil
+--Searchlistcell数组
+this.searchlistcellArr={}
+
+function this:init(gameObject)
+	self.go=gameObject
+	self.search_panel=self.go.transform:Find("search_panel"):GetComponent(typeof(PanelWidget))
+	self.search_CellRecycleScrollPanel=self.go.transform:Find("search_panel/mid_Panel/search_CellRecycleScrollPanel"):GetComponent(typeof(CellRecycleScrollWidget))
+	self.search_Text=self.go.transform:Find("search_panel/mid_Panel/search_Text"):GetComponent(typeof(TextWidget))
+	self.search_InputField=self.go.transform:Find("Image/search_InputField"):GetComponent(typeof(InputFieldWidget))
+	self.clear_Image=self.go.transform:Find("Image/Image/clear_Image"):GetComponent(typeof(ImageWidget))
+	self.cancel_Button=self.go.transform:Find("Image/cancel_Button"):GetComponent(typeof(ButtonWidget))
+	self.searchlistcellArr={}
+	table.insert(self.searchlistcellArr,self.new_Searchlistcell(self.go.transform:Find("search_panel/mid_Panel/search_CellRecycleScrollPanel/content/cellitem").gameObject))
+	table.insert(self.searchlistcellArr,self.new_Searchlistcell(self.go.transform:Find("search_panel/mid_Panel/search_CellRecycleScrollPanel/content/cellitem_1").gameObject))
+	table.insert(self.searchlistcellArr,self.new_Searchlistcell(self.go.transform:Find("search_panel/mid_Panel/search_CellRecycleScrollPanel/content/cellitem_2").gameObject))
+	table.insert(self.searchlistcellArr,self.new_Searchlistcell(self.go.transform:Find("search_panel/mid_Panel/search_CellRecycleScrollPanel/content/cellitem_3").gameObject))
+	table.insert(self.searchlistcellArr,self.new_Searchlistcell(self.go.transform:Find("search_panel/mid_Panel/search_CellRecycleScrollPanel/content/cellitem_4").gameObject))
+	table.insert(self.searchlistcellArr,self.new_Searchlistcell(self.go.transform:Find("search_panel/mid_Panel/search_CellRecycleScrollPanel/content/cellitem_5").gameObject))
+	table.insert(self.searchlistcellArr,self.new_Searchlistcell(self.go.transform:Find("search_panel/mid_Panel/search_CellRecycleScrollPanel/content/cellitem_6").gameObject))
+	table.insert(self.searchlistcellArr,self.new_Searchlistcell(self.go.transform:Find("search_panel/mid_Panel/search_CellRecycleScrollPanel/content/cellitem_7").gameObject))
+	table.insert(self.searchlistcellArr,self.new_Searchlistcell(self.go.transform:Find("search_panel/mid_Panel/search_CellRecycleScrollPanel/content/cellitem_8").gameObject))
+	table.insert(self.searchlistcellArr,self.new_Searchlistcell(self.go.transform:Find("search_panel/mid_Panel/search_CellRecycleScrollPanel/content/cellitem_9").gameObject))
+end
+
+--Searchlistcell复用单元
+function this.new_Searchlistcell(itemGo)
+	local item = { }
+	item.go = itemGo
+	item.friend_Panel=itemGo.transform:Find("friend_Panel"):GetComponent(typeof(PanelWidget))
+	item.newfriend_image=itemGo.transform:Find("friend_Panel/newfriend_image"):GetComponent(typeof(ImageWidget))
+	item.name_Text=itemGo.transform:Find("friend_Panel/name_Text"):GetComponent(typeof(TextWidget))
+	item.head_Image=itemGo.transform:Find("friend_Panel/head_Image"):GetComponent(typeof(CircleImageWidget))
+	item.sex_Image=itemGo.transform:Find("friend_Panel/head_Image/sex_Image"):GetComponent(typeof(ImageWidget))
+	item.sexbg_Icon=itemGo.transform:Find("friend_Panel/head_Image/sex_Image/sexbg_Icon"):GetComponent(typeof(IconWidget))
+	item.level_Text=itemGo.transform:Find("friend_Panel/head_Image/sex_Image/level_Text"):GetComponent(typeof(TextWidget))
+	item.honor_Text=itemGo.transform:Find("friend_Panel/honor_Text"):GetComponent(typeof(TextWidget))
+	item.distance_Text=itemGo.transform:Find("friend_Panel/distance_Text"):GetComponent(typeof(TextWidget))
+	item.friendredpoint_Icon=itemGo.transform:Find("friend_Panel/friendredpoint_Icon"):GetComponent(typeof(IconWidget))
+	item.friendredpoint_Text=itemGo.transform:Find("friend_Panel/friendredpoint_Icon/friendredpoint_Text"):GetComponent(typeof(TextWidget))
+	return item
+end
+

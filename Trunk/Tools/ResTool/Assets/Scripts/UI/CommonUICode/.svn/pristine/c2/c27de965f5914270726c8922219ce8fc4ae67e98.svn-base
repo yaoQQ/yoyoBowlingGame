@@ -1,0 +1,19 @@
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.UI;
+
+public class UIExEventTest : MonoBehaviour
+{
+    public ScrollPageRect hour_scroll_panel;
+
+    void Start()
+    {
+        //hour_scroll_panel.OpenPageScroll(24);
+        
+    }
+
+
+}

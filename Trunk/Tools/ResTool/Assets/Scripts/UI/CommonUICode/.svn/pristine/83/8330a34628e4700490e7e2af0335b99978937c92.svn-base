@@ -1,0 +1,169 @@
+﻿using UnityEngine;
+using System;
+using UnityEngine.EventSystems;
+#if !TOOL
+using XLua;
+
+[LuaCallCSharp]
+#endif
+public class TabPanelWidget : UIBaseWidget
+{
+
+    [Serializable]
+    public class TabControlEntry
+    {
+
+        [SerializeField]
+        public ButtonWidget tab = null;
+
+
+        [SerializeField]
+        public GameObject panel = null;
+
+
+        public bool forbiddenSign = false;
+
+        public string forbiddenTip = string.Empty;
+
+    }
+
+    [SerializeField]
+    public TabControlEntry[] entities;
+
+    int curIndexID;
+
+    Action<object> OnChangeHandler;
+
+    public override bool AddEventListener(UIEvent eventType, Action<PointerEventData> onEventHandler)
+    {
+        bool sign = true;
+        switch (eventType)
+        {
+            default:
+                sign = false;
+                break;
+        }
+
+        return sign;
+    }
+    public override bool AddCustomEventListener(UICustomEvent eventType, Action<object> onEventHandler)
+    {
+        bool sign = true;
+        switch (eventType)
+        {
+            case UICustomEvent.Change:
+                OnChangeHandler = onEventHandler;
+                break;
+            default:
+                sign = false;
+                break;
+        }
+
+        return sign;
+    }
+
+
+
+    public override WidgetType GetWidgetType()
+    {
+        return WidgetType.TabPanel;
+    }
+
+    void Awake()
+    {
+        foreach (TabControlEntry entry in entities)
+        {
+            AddButtonListener(entry);
+        }
+
+        if (entities.Length > 0)
+        {
+            SelectTab(entities[0]);
+        }
+    }
+    void AddButtonListener(TabControlEntry entry)
+    {
+        entry.tab.Btn.onClick.AddListener(() => {
+            if (entry.forbiddenSign)
+            {
+                if (!string.IsNullOrEmpty(entry.forbiddenTip))
+                {
+#if TOOL
+#else
+                    //OperationFeedbackTips.Popup(entry.forbiddenTip);
+#endif
+
+                }
+                return;
+            }
+            SelectTab(entry);
+        });
+    }
+    void SelectTab(TabControlEntry selectedEntry)
+    {
+        for (int i = 0; i < entities.Length; i++)
+        {
+            TabControlEntry entry = entities[i];
+            bool isSelected = (entry == selectedEntry);
+
+            entry.tab.SetInteractable(!isSelected);//被选择就要禁用;
+
+            entry.panel.SetActive(isSelected);
+            if (isSelected)
+            {
+                curIndexID = i;
+                if (OnChangeHandler != null)
+                {
+                    OnChangeHandler(curIndexID);
+                }
+            }
+        }
+    }
+
+    public void SelectTabByIndex(int index)
+    {
+        for (int i = 0; i < entities.Length; i++)
+        {
+            TabControlEntry entry = entities[i];
+            bool isSelected = index == i ? true : false;
+
+            if (isSelected)
+            {
+                SelectTab(entry);
+            }
+        }
+    }
+    public void ShowHideTabBtns(bool sign)
+    {
+        foreach (TabControlEntry entry in entities)
+        {
+            entry.tab.gameObject.SetActive(sign);
+        }
+
+    }
+    public void ForbiddenEntry(int index, bool sign, string forbiddenTipValue = "")
+    {
+        if (index >= 0 && index < entities.Length)
+        {
+            TabControlEntry entry = entities[index];
+            entry.forbiddenSign = sign;
+            entry.forbiddenTip = forbiddenTipValue;
+        }
+    }
+
+    public GameObject GetPanelByIndex(int index)
+    {
+        for (int i = 0; i < entities.Length; i++)
+        {
+            TabControlEntry entry = entities[i];
+            bool isSelected = index == i ? true : false;
+
+            if (isSelected)
+            {
+                return entry.panel;
+            }
+        }
+        return null;
+    }
+
+}

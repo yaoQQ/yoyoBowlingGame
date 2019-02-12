@@ -1,0 +1,159 @@
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.EventSystems;
+
+public class UIExEventListener : UnityEngine.EventSystems.EventTrigger
+{
+    public delegate void VoidDelegate(PointerEventData eventData);
+    [Tooltip("长按界定时间")]
+    public const float longDefinition = 0.6f;
+    [Tooltip("双击界定时间")]
+    public const float shortDefinition = 0.3f;
+    private bool isPointerDown = false;
+    private bool isLongPressTriggered = false;
+    private float timePressStarted;
+
+    public Action<PointerEventData> onShortClick;
+    public Action<PointerEventData> onLongClick;
+    public Action<PointerEventData> onDoubleClick;
+    public Action<PointerEventData> onDrag;
+    public Action<PointerEventData> onDragBegin;
+    public Action<PointerEventData> onDragEnd;
+    public Action<PointerEventData> onPointerUp;
+    public Action<PointerEventData> onPointerDown;
+
+    private PointerEventData eventData;
+
+
+    static public UIExEventListener Get(GameObject go)
+    {
+        UIExEventListener listener = go.GetComponent<UIExEventListener>();
+        if (listener == null) listener = go.AddComponent<UIExEventListener>();
+        return listener;
+    }
+
+    static public UIExEventListener Get(Transform transform)
+    {
+        UIExEventListener listener = transform.GetComponent<UIExEventListener>();
+        if (listener == null) listener = transform.gameObject.AddComponent<UIExEventListener>();
+        return listener;
+    }
+
+    private void Update()
+    {
+        ProcessPointerEvent();
+    }
+
+    void ProcessPointerEvent()
+    {
+        if (isPointerDown && !isLongPressTriggered)
+        {
+            var curTime = Time.unscaledTime;
+            if (curTime - timePressStarted > longDefinition)
+            {
+                isLongPressTriggered = true;
+                if (onLongClick != null && eventData != null)
+                    onLongClick.Invoke(eventData);
+            }
+        }
+        if (downQueue.Count > 0)
+        {
+            var lastTime = downQueue.Peek();
+            var curTime = Time.unscaledTime;
+            var deltaTime = curTime - lastTime;
+            //Debug.Log("deltaTime = " + deltaTime);
+            if (deltaTime >= shortDefinition && downQueue.Count == 1)
+            {
+                //Debug.Log("单击");
+                downQueue.Clear();
+                if (onShortClick != null)
+                    onShortClick.Invoke(eventData);
+            }
+            else if (deltaTime < shortDefinition && downQueue.Count > 1)
+            {
+                //Debug.Log("双击");
+                downQueue.Clear();
+                if (onDoubleClick != null)
+                    onDoubleClick.Invoke(eventData);
+            }
+        }
+    }
+    void ProcessPinchEvent()
+    {
+        if (Input.touchCount == 2)
+        {
+            // Store both touches.
+            Touch touchZero = Input.GetTouch(0);
+            Touch touchOne = Input.GetTouch(1);
+
+            // Find the position in the previous frame of each touch.
+            Vector2 touchZeroPrevPos = touchZero.position - touchZero.deltaPosition;
+            Vector2 touchOnePrevPos = touchOne.position - touchOne.deltaPosition;
+
+            // Find the magnitude of the vector (the distance) between the touches in each frame.
+            float prevTouchDeltaMag = (touchZeroPrevPos - touchOnePrevPos).magnitude;
+            float touchDeltaMag = (touchZero.position - touchOne.position).magnitude;
+
+            // Find the difference in the distances between each frame.
+            float deltaMagnitudeDiff = prevTouchDeltaMag - touchDeltaMag;
+
+            // ... change the canvas size based on the change in distance between the touches.
+
+            // Make sure the canvas size never drops below 0.1
+        }
+    }
+    private Queue<float> downQueue = new Queue<float>();
+    public override void OnPointerDown(PointerEventData eventData)
+    {
+        timePressStarted = Time.unscaledTime;
+        isPointerDown = true;
+        this.eventData = eventData;
+        isLongPressTriggered = false;
+        if (this.onPointerDown != null) this.onPointerDown.Invoke(eventData);
+
+    }
+
+    public override void OnPointerUp(PointerEventData eventData)
+    {
+        this.eventData = eventData;
+
+        timePressStarted = 0f;
+        isPointerDown = false;
+        if (this.onPointerUp != null) this.onPointerUp.Invoke(eventData);
+    }
+
+    public override void OnPointerExit(PointerEventData eventData)
+    {
+        this.eventData = eventData;
+        isPointerDown = false;
+    }
+
+    public override void OnPointerClick(PointerEventData eventData)
+    {
+        if (!isLongPressTriggered)
+        {
+            var clickTime = Time.unscaledTime;
+            downQueue.Enqueue(clickTime);
+        }
+    }
+
+    public override void OnDrag(PointerEventData eventData)
+    {
+        if (this.onDrag != null) this.onDrag.Invoke(eventData);
+    }
+
+    public override void OnBeginDrag(PointerEventData eventData)
+    {
+        isLongPressTriggered = true;
+        if (this.onDragBegin != null) this.onDragBegin.Invoke(eventData);
+    }
+
+    public override void OnEndDrag(PointerEventData eventData)
+    {
+        if (this.onDragEnd != null) this.onDragEnd.Invoke(eventData);
+    }
+
+
+}

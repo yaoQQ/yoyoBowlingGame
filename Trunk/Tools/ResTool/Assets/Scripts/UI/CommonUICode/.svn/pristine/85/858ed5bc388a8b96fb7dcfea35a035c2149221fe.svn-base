@@ -1,0 +1,284 @@
+﻿using UnityEngine;
+using System.Collections.Generic;
+using System;
+#if !TOOL
+using XLua;
+
+[LuaCallCSharp]
+#endif
+public class CellRecycleScrollWidget : ScrollPanelWidget
+{
+
+
+
+    public override WidgetType GetWidgetType()
+    {
+        return WidgetType.CellRecycleScroll;
+    }
+
+    bool initDataSign = false;
+
+    public string cellItemName;
+    public CellItemWidget[] cellItemArr;
+    List<object> dataList = new List<object>();
+    Action<GameObject, object, int> onUpdateCellData;
+
+    public float cellSpaceValue;
+
+    void Awake()
+    {
+
+    }
+
+    public float cellPosValue;
+
+    int startIndex;
+
+    public int StartIndex
+    {
+        get { return startIndex; }
+    }
+
+    public object GetDataByIndex(int index)
+    {
+        if (index < dataList.Count)
+        {
+            return dataList[index];
+        }
+        return null;
+    }
+
+
+    protected override void OnValueChanged(Vector2 v2)
+    {
+        base.OnValueChanged(v2);
+
+        float contentPosValue;
+
+        int currIndex;
+        if (scrollRect.vertical)
+        {
+            contentPosValue = scrollRect.content.anchoredPosition.y;
+            currIndex = Mathf.FloorToInt(contentPosValue / (cellPosValue + cellSpaceValue) - 1f);
+        }
+        else
+        {
+            contentPosValue = scrollRect.content.anchoredPosition.x;
+            currIndex = Math.Abs(Mathf.FloorToInt(contentPosValue / (cellPosValue + cellSpaceValue))) - 1;
+        }
+        if (currIndex == startIndex)
+            return;
+        startIndex = currIndex;
+        //先改变布局;
+        setitemslayout(startIndex);
+
+
+        //再设置数据;
+        updateView();
+    }
+    void updateView() {
+        //再设置数据;
+        if (initDataSign) {
+            List<object> dList = GetShowDataList(startIndex);
+            for (int i = 0; i < dList.Count; i++) {
+                if (dList[i] == null) {
+                    cellItemArr[i].gameObject.SetActive(false);
+                }
+                else {
+
+                    cellItemArr[i].gameObject.SetActive(true);
+                    onUpdateCellData(cellItemArr[i].gameObject, dList[i], i);
+                }
+
+            }
+
+        }
+    }
+    void setitemslayout(int startIndex)
+    {
+
+        for (int i = 0; i < cellItemArr.Length; i++)
+        {
+            GameObject itemGO = cellItemArr[i].gameObject;
+            RectTransform itemRT = itemGO.GetComponent<RectTransform>();
+            if (scrollRect.vertical)
+            {
+                itemRT.anchoredPosition = new Vector2(0f, (cellPosValue + cellSpaceValue) * (startIndex + i) * -1);
+              //  Debug.LogFormat("itemRT[{0}].anchoredPosition", i);
+            }
+            else
+            {
+                itemRT.anchoredPosition = new Vector2((cellPosValue + cellSpaceValue) * (startIndex + i), 0);
+            }
+        }
+    }
+    List<object> GetShowDataList(int startIndex)
+    {
+        List<object> dList = new List<object>();
+        while (startIndex < 0)
+        {
+            startIndex++;
+            dList.Add(null);
+        }
+
+        int len;
+
+        len = Math.Min(dataList.Count, cellItemArr.Length - dList.Count);
+
+        len = startIndex + len;
+        for (int i = startIndex; i < len; i++)
+        {
+            if (dataList.Count > i)
+                dList.Add(dataList[i]);
+        }
+
+        while (dList.Count < cellItemArr.Length)
+        {
+            dList.Add(null);
+        }
+
+        return dList;
+    }
+
+    public void SetCellData(List<object> p_dataList, Action<GameObject, object, int> p_onUpdateCellData, bool resetPos = false)
+    {
+        if (p_dataList.Count > cellItemArr.Length - 2)
+        {
+            scrollRect.enabled = true;
+        }
+        else
+        {
+            scrollRect.enabled = false;
+            scrollRect.content.anchoredPosition = Vector2.zero;
+        }
+
+        initDataSign = true;
+
+        dataList.Clear();
+
+        //object[] tempArr = Array.ConvertAll<T, object>(p_dataList.ToArray(), new Converter<T, object>(ConverterFun<T>));
+        // dataList = new List<object>(tempArr);
+        for (int i = 0; i < p_dataList.Count; ++i)
+        {
+            object obj = p_dataList[i] as object;
+            dataList.Add(obj);
+
+        }
+
+        onUpdateCellData = p_onUpdateCellData;
+
+        if (scrollRect.vertical)
+        {
+            SetContentSize((cellPosValue + cellSpaceValue) * p_dataList.Count - cellSpaceValue, resetPos);
+            scrollRect.content.anchorMin = new Vector2(0.5f, 1f);
+            scrollRect.content.anchorMax = new Vector2(0.5f, 1f);
+            scrollRect.content.pivot = new Vector2(0.5f, 1f);
+        }
+        else
+        {
+            SetContentSize((cellPosValue + cellSpaceValue) * p_dataList.Count - cellSpaceValue, resetPos);
+            scrollRect.content.anchorMin = new Vector2(0f, 0.5f);
+            scrollRect.content.anchorMax = new Vector2(0f, 0.5f);
+            scrollRect.content.pivot = new Vector2(0f, 0.5f);
+        }
+        if (resetPos)
+        {
+            OnValueChanged(new Vector2());
+        }
+        else
+        {
+            OnValueChanged(contentRT.anchoredPosition);
+        }
+        updateView();
+    }
+
+    public void SetCellData<T>(List<T> p_dataList, Action<GameObject, object, int> p_onUpdateCellData, bool resetPos = false)
+    {
+        SetCellData(p_dataList, p_onUpdateCellData, resetPos);
+    }
+
+    public void SetContentPos(float value)
+    {
+        if (scrollRect.vertical)
+        {
+            scrollRect.content.anchoredPosition = new Vector2(scrollRect.content.anchoredPosition.x, value);
+        }
+        else
+        {
+            scrollRect.content.anchoredPosition = new Vector2(value, scrollRect.content.anchoredPosition.y);
+        }
+    }
+
+    public void LocateCellPosition(int dataIndex)
+    {
+        if (dataList.Count <= cellItemArr.Length - 2)
+        {
+            return;
+        }
+        if (dataIndex < 0)
+        {
+            return;
+        }
+
+        int maxIndex = dataList.Count - cellItemArr.Length + 2;
+        if (dataIndex > maxIndex)
+        {
+            dataIndex = maxIndex;
+        }
+
+        float pos = dataIndex * cellPosValue;
+        SetContentPos(pos);
+        OnValueChanged(new Vector2());
+    }
+
+    [SerializeField]
+    AnimationCurve appearCurve;//= AnimationCurve.EaseInOut(0,0f, 0.35f, 1f);
+
+
+    public void HoldAppearScroll(float scale)
+    {
+        if (scrollRect.vertical)
+        {
+            if (scale != 1)
+            {
+                //scroll.verticalNormalizedPosition = 3.5f;
+                scrollRect.content.gameObject.SetActive(false);
+            }
+            else
+            {
+                if (tween != null)
+                {
+                    tween.Stop();
+                }
+                scrollRect.verticalNormalizedPosition = 3.5f;
+                scrollRect.content.gameObject.SetActive(true);
+
+                tween = Tween.AutoManagerTween(scrollRect.content.gameObject, 0.35f);
+                tween.SetCurve(appearCurve);
+                tween.OnUpdate += OnAppearScroll;
+                tween.Play();
+            }
+        }
+    }
+
+    public void AppearScroll(float holdTime)
+    {
+        scrollRect.content.gameObject.SetActive(false);
+        tween = Tween.AutoManagerTween(scrollRect.gameObject, holdTime);
+        AnimationCurve curve = AnimationCurve.EaseInOut(0, 0, 1f, 1f);
+        tween.SetCurve(curve);
+        tween.OnUpdate += HoldAppearScroll;
+        //tween.OnComplete += OnTweenEnd;
+        tween.Play();
+    }
+
+    void OnAppearScroll(float scale)
+    {
+        if (scrollRect.vertical)
+        {
+            //Debug.LogError(scale);
+            scrollRect.verticalNormalizedPosition = 1 + 2.5f * (1 - scale);
+
+        }
+    }
+}

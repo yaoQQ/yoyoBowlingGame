@@ -1,0 +1,24 @@
+﻿using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class UIExEventTest : MonoBehaviour
+{
+
+    // Use this for initialization
+    void Start()
+    {
+        UIExEventListener.Get(gameObject).onLongClick += (eventData) => { Debug.Log("长按"); };
+        UIExEventListener.Get(gameObject).onDoubleClick += (eventData) => { Debug.Log("双击"); };
+        UIExEventListener.Get(gameObject).onShortClick += (eventData) => { Debug.Log("短按"); };
+        UIExEventListener.Get(gameObject).onDragBegin += (eventData) => { Debug.Log("滑动开始"); };
+        UIExEventListener.Get(gameObject).onDrag += (eventData) => { /*Debug.Log("滑动中"); */};
+        UIExEventListener.Get(gameObject).onDragEnd += (eventData) => { Debug.Log("滑动结束"); };
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+
+    }
+}

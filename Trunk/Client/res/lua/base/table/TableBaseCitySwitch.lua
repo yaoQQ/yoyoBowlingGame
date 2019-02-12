@@ -1,0 +1,35 @@
+﻿TableBaseCitySwitch = {data = {}}
+
+TableBaseCitySwitch.m_isInit = false
+
+function TableBaseCitySwitch.init()
+	if TableBaseCitySwitch.m_isInit then
+		return
+	else
+		TableBaseCitySwitch.data[1] = { id = 1, city_id = 010, city_name = "北京", lng = 116.407436, lat = 39.904183}
+		TableBaseCitySwitch.data[2] = { id = 2, city_id = 021, city_name = "上海", lng = 121.473698, lat = 31.230376}
+		TableBaseCitySwitch.data[3] = { id = 3, city_id = 020, city_name = "广州", lng = 113.264479, lat = 23.130086}
+		TableBaseCitySwitch.data[4] = { id = 4, city_id = 0755, city_name = "深圳", lng = 114.057918, lat = 22.543507}
+		TableBaseCitySwitch.data[5] = { id = 5, city_id = 028, city_name = "成都", lng = 104.0661, lat = 30.57328}
+		TableBaseCitySwitch.data[6] = { id = 6, city_id = 0571, city_name = "杭州", lng = 120.210606, lat = 30.246145}
+		TableBaseCitySwitch.data[7] = { id = 7, city_id = 023, city_name = "重庆", lng = 106.550421, lat = 29.563761}
+		TableBaseCitySwitch.data[8] = { id = 8, city_id = 027, city_name = "武汉", lng = 114.305128, lat = 30.592897}
+		TableBaseCitySwitch.data[9] = { id = 9, city_id = 0512, city_name = "苏州", lng = 120.585193, lat = 31.299659}
+		TableBaseCitySwitch.data[10] = { id = 10, city_id = 029, city_name = "西安", lng = 108.939621, lat = 34.343147}
+		TableBaseCitySwitch.data[11] = { id = 11, city_id = 022, city_name = "天津", lng = 117.200723, lat = 39.085894}
+		TableBaseCitySwitch.data[12] = { id = 12, city_id = 025, city_name = "南京", lng = 118.796752, lat = 32.059279}
+		TableBaseCitySwitch.data[13] = { id = 13, city_id = 0371, city_name = "郑州", lng = 113.625381, lat = 34.746245}
+		TableBaseCitySwitch.data[14] = { id = 14, city_id = 0731, city_name = "长沙", lng = 112.938845, lat = 28.228348}
+		TableBaseCitySwitch.data[15] = { id = 15, city_id = 024, city_name = "沈阳", lng = 123.464636, lat = 41.677425}
+		TableBaseCitySwitch.data[16] = { id = 16, city_id = 0532, city_name = "青岛", lng = 120.382751, lat = 36.066923}
+		TableBaseCitySwitch.data[17] = { id = 17, city_id = 0574, city_name = "宁波", lng = 121.624924, lat = 29.860129}
+		TableBaseCitySwitch.data[18] = { id = 18, city_id = 0769, city_name = "东莞", lng = 113.751913, lat = 23.020932}
+		TableBaseCitySwitch.data[19] = { id = 19, city_id = 0510, city_name = "无锡", lng = 120.311876, lat = 31.491719}
+		TableBaseCitySwitch.m_isInit = true
+	end
+end
+
+function TableBaseCitySwitch.clear()
+	TableBaseCitySwitch.m_isInit = false
+	TableBaseCitySwitch.data = {}
+end

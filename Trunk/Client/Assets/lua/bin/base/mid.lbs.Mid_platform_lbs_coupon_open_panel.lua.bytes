@@ -1,0 +1,50 @@
+local ImageWidget=CS.ImageWidget
+local EffectWidget=CS.EffectWidget
+local CircleImageWidget=CS.CircleImageWidget
+local TextWidget=CS.TextWidget
+local EmptyImageWidget=CS.EmptyImageWidget
+local IconWidget=CS.IconWidget
+local ButtonWidget=CS.ButtonWidget
+
+Mid_platform_lbs_coupon_open_panel={}
+local this = Mid_platform_lbs_coupon_open_panel
+
+function this:new(gameObject)
+	local o = { }
+	setmetatable(o, self)
+	self.__index = self
+	o:init(gameObject)
+	return o
+end
+
+this.go = nil
+this.mask_image=nil
+this.coupon_bg_effect=nil
+this.head_circleImage=nil
+this.name_text=nil
+this.close_image=nil
+this.title_text=nil
+this.coupon_bg_icon=nil
+this.coupon_diy_image=nil
+this.coupon_image=nil
+this.coupon_shop_name_text=nil
+this.coupon_name_text=nil
+this.openredbag_btn=nil
+
+function this:init(gameObject)
+	self.go=gameObject
+	self.mask_image=self.go.transform:Find("mask_image"):GetComponent(typeof(ImageWidget))
+	self.coupon_bg_effect=self.go.transform:Find("coupon_bg_effect"):GetComponent(typeof(EffectWidget))
+	self.head_circleImage=self.go.transform:Find("Panel/image/Image/head_circleImage"):GetComponent(typeof(CircleImageWidget))
+	self.name_text=self.go.transform:Find("Panel/image/name_text"):GetComponent(typeof(TextWidget))
+	self.close_image=self.go.transform:Find("Panel/image/close_image"):GetComponent(typeof(EmptyImageWidget))
+	self.title_text=self.go.transform:Find("Panel/image/title_text"):GetComponent(typeof(TextWidget))
+	self.coupon_bg_icon=self.go.transform:Find("Panel/image/coupon_bg_icon"):GetComponent(typeof(IconWidget))
+	self.coupon_diy_image=self.go.transform:Find("Panel/image/coupon_bg_icon/coupon_diy_image"):GetComponent(typeof(ImageWidget))
+	self.coupon_image=self.go.transform:Find("Panel/image/coupon_bg_icon/coupon_image"):GetComponent(typeof(CircleImageWidget))
+	self.coupon_shop_name_text=self.go.transform:Find("Panel/image/coupon_bg_icon/coupon_shop_name_text"):GetComponent(typeof(TextWidget))
+	self.coupon_name_text=self.go.transform:Find("Panel/image/coupon_bg_icon/coupon_name_text"):GetComponent(typeof(TextWidget))
+	self.openredbag_btn=self.go.transform:Find("Panel/image/openredbag_btn"):GetComponent(typeof(ButtonWidget))
+end
+
+

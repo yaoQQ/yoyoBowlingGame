@@ -1,0 +1,98 @@
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.EventSystems;
+public class UIExClickListener : UIBehaviour, IPointerClickHandler, IPointerDownHandler, IPointerUpHandler
+{
+    [Tooltip("单击界定时间")]
+    public const float shortDefinition = 0.2f;
+    public static UIExClickListener Get(GameObject go)
+    {
+        UIExClickListener listener = go.GetComponent<UIExClickListener>();
+        if (listener == null) listener = go.AddComponent<UIExClickListener>();
+        return listener;
+    }
+
+    public Action<PointerEventData> onSingleHandler;
+    public Action<PointerEventData> onDoubleHandler;
+
+    private PointerEventData m_eventData;
+    private UIExLongClickListener longListener;
+    /// <summary>
+    /// 是否阻断本事件, 用于父容器有其自己的事件, 或者同时存在长按事件时
+    /// </summary>
+    private bool m_isInterdict = false;
+    public bool isInterdict
+    {
+        get
+        {
+            if (longListener == null)
+                longListener = GetComponent<UIExLongClickListener>();
+            m_isInterdict = longListener == null ? false : longListener.IsLongPressTriggered;
+            return m_isInterdict;
+        }
+        set { m_isInterdict = value; }
+    }
+
+    void Update()
+    {
+        if (downTimeQueue.Count > 0)
+        {
+            var lastTime = downTimeQueue.Peek();
+            var curTime = Time.unscaledTime;
+            var deltaTime = curTime - lastTime;
+            ////Debug.Log("deltaTime = " + deltaTime);
+            if (deltaTime >= shortDefinition)
+            {
+                if (isInterdict == false && isPointUp)
+                {
+                    if (onSingleHandler != null && m_eventData != null)
+                    {
+                        onSingleHandler.Invoke(m_eventData);
+                        m_eventData = null;
+                    }
+                }
+                downTimeQueue.Clear();
+            }
+            else if (downTimeQueue.Count > 1)
+            {
+                downTimeQueue.Clear();
+            }
+        }
+    }
+
+    float lastTimeClick;
+    public void OnPointerClick(PointerEventData eventData)
+    {
+        //Debug.Log("点击");
+        float currentTimeClick = eventData.clickTime;
+        var diffTime = currentTimeClick - lastTimeClick;
+        if (diffTime < 0.3f)
+        {
+            //Debug.LogFormat("双击, isLongPressed = {0}, m_isDragging = {1}", isLongPressed(), m_isDragging);
+            if (isInterdict == false)
+                if (onDoubleHandler != null) onDoubleHandler.Invoke(eventData);
+        }
+        lastTimeClick = currentTimeClick;
+        m_eventData = eventData;
+    }
+    private Queue<float> downTimeQueue = new Queue<float>();
+    private bool isPointUp = false;
+    public void OnPointerDown(PointerEventData eventData)
+    {
+        //Debug.Log("按下");
+        isPointUp = false;
+        if (downTimeQueue.Count < 2)
+        {
+            var time = Time.unscaledTime;
+            downTimeQueue.Enqueue(time);
+        }
+    }
+
+    public void OnPointerUp(PointerEventData eventData)
+    {
+        //Debug.Log("弹起");
+        isPointUp = true;
+    }
+}

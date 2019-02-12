@@ -1,0 +1,90 @@
+﻿using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.UI;
+#if !TOOL
+using XLua;
+
+[LuaCallCSharp]
+#endif
+public class UIExEventTool
+{
+    /// <summary>
+    /// 从屏幕坐标转成UI系统下的根局部坐标
+    /// </summary>
+    /// <param name="go"></param>
+    /// <param name="screenPos"></param>
+    /// <param name="camera"></param>
+    /// <returns></returns>
+    public static Vector2 ScreenToUIRootLocal(GameObject go, Vector2 screenPos, Camera camera)
+    {
+        Vector2 target = new Vector2(99999, 99999);
+        var graphic = go.GetComponent<Graphic>();
+        if (graphic == null)
+            return target;
+        var canvasRTransform = graphic.canvas.transform as RectTransform;
+        Vector2 local;
+        if (RectTransformUtility.ScreenPointToLocalPointInRectangle(canvasRTransform, screenPos, camera, out local))
+        {
+            target = local;
+        }
+        return target;
+    }
+
+    /// <summary>
+    /// 相对指定物体的局部坐标
+    /// </summary>
+    /// <param name="go"></param>
+    /// <param name="target"></param>
+    /// <param name="screenPos"></param>
+    /// <param name="camera"></param>
+    /// <returns></returns>
+    public static Vector2 ScreenToTargetLocal(GameObject go, GameObject target, Vector2 screenPos, Camera camera)
+    {
+        Vector2 temp = new Vector2(99999, 99999);
+        var graphic = go.GetComponent<Graphic>();
+        if (graphic == null)
+            return temp;
+        var rTransform = target.transform as RectTransform;
+        if (rTransform == null)
+            return temp;
+        Vector2 local;
+        if (RectTransformUtility.ScreenPointToLocalPointInRectangle(rTransform, screenPos, camera, out local))
+        {
+            temp = local;
+        }
+        return temp;
+    }
+
+    public static Vector2? ScreenToUIRootLocalNull(GameObject go, Vector2 screenPos, Camera camera)
+    {
+        var graphic = go.GetComponent<Graphic>();
+        if (graphic == null)
+            return null;
+        var canvasRTransform = graphic.canvas.transform as RectTransform;
+        Vector2 local;
+        if (RectTransformUtility.ScreenPointToLocalPointInRectangle(canvasRTransform, screenPos, camera, out local))
+        {
+            return local;
+        }
+        else
+            return null;
+    }
+
+    public static Vector3 ScreenToWorld(GameObject go, Vector2 screenPos, Camera camera)
+    {
+        Vector3 target = new Vector3(99999, 99999, 99999);
+        var graphic = go.GetComponent<Graphic>();
+        if (graphic == null)
+            return target;
+        var canvasRTransform = graphic.canvas.transform as RectTransform;
+        Vector3 world;
+        if (RectTransformUtility.ScreenPointToWorldPointInRectangle(canvasRTransform, screenPos, camera, out world))
+        {
+            target = world;
+        }
+        return target;
+    }
+
+
+}

@@ -1,0 +1,324 @@
+﻿using UnityEngine;
+using System;
+using UnityEngine.EventSystems;
+using UnityEngine.UI;
+#if !TOOL
+using XLua;
+
+[LuaCallCSharp]
+#endif
+public class EffectWidget : UIBaseWidget
+{
+    public override bool AddEventListener(UIEvent eventType, Action<PointerEventData> onEventHandler)
+    {
+        return false;
+    }
+    public override bool RemoveEventListener(UIEvent eventType, Action<PointerEventData> onEventHandler)
+    {
+        return false;
+    }
+
+    public override WidgetType GetWidgetType()
+    {
+        return WidgetType.Effect;
+    }
+
+    public Image maskImg;
+
+
+    public String packName;
+    public String effectName;
+
+    
+
+    EffectControler effectControler;
+
+
+
+    RectTransform effectGORT;
+
+    int sortingValue = -1;
+    bool initSortSign = false;
+
+    bool initSign = false;
+
+    bool playSign=false;
+
+    void Awake()
+    {
+        maskImg.enabled = false;
+        //Play();
+    }
+    void OnEnable()
+    {
+        //Play();
+    }
+
+    void OnDisable()
+    {
+#if TOOL
+#else
+        Stop();
+#endif
+    }
+    void OnDestroy()
+    {  
+#if TOOL
+#else
+        Stop();
+#endif
+    }
+    public void Play()
+    {
+        playSign = true;
+        if (!initSign )
+        {
+#if TOOL
+          
+#else
+            //effectGO.transform.localPosition = new Vector3(0f, 0f, -100f);
+            //effectGORT.localScale = Vector3.one;
+            initSign = true;
+            EffectManager.Instance.CreateEffect(packName, effectName, OnEffectLoadEnd);
+
+#endif
+        }
+        //SetTrack(curTrackType, _runTime, trackValueArr);
+        if(effectControler!=null)
+        {
+            effectControler.Play();
+        }
+    }
+
+    void OnEffectLoadEnd(EffectControler controler)
+    {
+        effectControler = controler;
+        SetUILayer(effectControler.gameObject, LayerMask.NameToLayer("UI"));
+        UITools.SetParentAndAlign(effectControler.gameObject, this.gameObject);
+        effectControler.gameObject.transform.SetParent(this.gameObject.transform);
+        controler.gameObject.transform.localPosition = new Vector3(0f, 0f, -100f);
+        
+        if (playSign)
+        {
+            effectControler.Play();
+        }
+    }
+
+
+
+#region 动画
+
+    public enum TrackType
+    {
+        none,
+        circle,
+        rect,
+    }
+
+    TrackType curTrackType = TrackType.none;
+    float[] trackValueArr;
+
+    float xValue;
+    float yValue;
+
+    Tween tween;
+
+    float _runTime;
+
+    public void SetTrack(TrackType type, float runTime = 1f, params float[] valueArr)
+    {
+        _runTime = runTime;
+        curTrackType = type;
+        trackValueArr = valueArr;
+        if (tween != null)
+        {
+            tween.Stop();
+        }
+        if (curTrackType == TrackType.none)
+        {
+            effectControler.gameObject.transform.localPosition = new Vector3(0f, 0f, -100f);
+            return;
+        }
+        if (tween == null)
+        {
+            tween = Tween.AutoManagerTween(this.gameObject, _runTime);
+            tween.OnUpdate += UpdateTrack;
+            tween.OnComplete += EndTrack;
+        }
+
+        tween.Play();
+    }
+
+    void UpdateTrack(float scale)
+    {
+        if (effectControler.gameObject == null) return;
+        if (!effectControler.gameObject.activeSelf) return;
+        switch (curTrackType)
+        {
+            case TrackType.circle:
+                OnCircleUpdate(scale);
+                break;
+            case TrackType.rect:
+                OnRectUpdate(scale);
+                break;
+        }
+    }
+    bool EndTrack()
+    {
+        return true;
+    }
+
+
+    void OnCircleUpdate(float scale)
+    {
+        if (trackValueArr == null || trackValueArr.Length == 0) return;
+        float trackValue = trackValueArr[0];
+        float angleValue = 360 * scale;
+        float xValue = trackValue * Mathf.Cos(angleValue * Mathf.PI / 180);
+        float yValue = trackValue * Mathf.Sin(angleValue * Mathf.PI / 180);
+        effectGORT.anchoredPosition = new Vector2(xValue, yValue);
+    }
+
+    void OnRectUpdate(float scale)
+    {
+        if (trackValueArr == null || trackValueArr.Length != 2) return;
+        float wValue = trackValueArr[0];
+        float hValue = trackValueArr[1];
+        float wPer = wValue / (wValue + hValue) * 0.5f;
+        float hPer = hValue / (wValue + hValue) * 0.5f;
+        float xValue;
+        float yValue;
+        if (scale < 0.5)
+        {
+            if (scale < wPer)
+            {
+                //上边
+                xValue = -wValue / 2f + wValue * scale / wPer;
+                yValue = hValue / 2f;
+
+            }
+            else
+            {
+                //右边
+                scale -= wPer;
+                xValue = wValue / 2f;
+                yValue = hValue / 2f - hValue * scale / hPer;
+            }
+        }
+        else
+        {
+            scale -= 0.5f;
+            if (scale < (wPer))
+            {
+                //下边
+                xValue = wValue / 2f - wValue * scale / wPer;
+                yValue = -hValue / 2f;
+            }
+            else
+            {
+                //左边
+                scale -= wPer;
+                xValue = -wValue / 2f;
+                yValue = -hValue / 2f + hValue * scale / hPer;
+            }
+        }
+
+        effectGORT.anchoredPosition = new Vector2(xValue, yValue);
+    }
+
+#endregion
+
+    public void Stop()
+    {
+        playSign = false;
+        if(effectControler!=null)
+        {
+            effectControler.Stop();
+        }
+        //if (tween != null)
+        //{
+        //    tween.Stop();
+        //}
+        //if (effectGO != null)
+        //{
+        //    GameObject.Destroy(effectGO);
+        //}
+        //effectGO = null;
+        //initSortSign = false;
+    }
+
+
+#region 特效排序
+
+    void Update()
+    {
+        if (effectControler == null) return;
+        if (sortingValue == -1) sortingValue = GetEffectSorting();
+        if (sortingValue != -1 && !initSortSign && effectControler.transform.childCount > 0)
+        {
+            initSortSign = true;
+            SetUISortingOrder(effectControler.gameObject, sortingValue);
+        }
+    }
+
+
+    int GetEffectSorting()
+    {
+        Canvas owerCan = GetCanvas(gameObject);
+        if (owerCan != null)
+        {
+            return owerCan.sortingOrder;
+
+
+        }
+        return -1;
+    }
+
+    Canvas GetCanvas(GameObject go)
+    {
+        Canvas can = null;
+        while (can == null && go.transform.parent != null)
+        {
+
+            go = go.transform.parent.gameObject;
+            can = go.GetComponent<Canvas>();
+        }
+        return can;
+    }
+
+    void SetUISortingOrder(GameObject go, int sortingOrder)
+    {
+        if (go == null) return;
+        ParticleSystem ps = go.GetComponent<ParticleSystem>();
+        if (ps != null)
+        {
+            ps.GetComponent<Renderer>().sortingLayerName = "UIP";
+            ps.GetComponent<Renderer>().sortingOrder = sortingOrder;
+        }
+        for (int i = 0; i < go.transform.childCount; i++)
+        {
+            GameObject child = go.transform.GetChild(i).gameObject;
+            SetUISortingOrder(child, sortingOrder);
+        }
+        MeshRenderer mr = go.GetComponent<MeshRenderer>();
+        if (mr != null)
+        {
+            mr.sortingOrder = sortingOrder;
+        }
+    }
+#endregion
+
+
+    void SetUILayer(GameObject go, int layerValue)
+    {
+        RectTransform rt = go.transform as RectTransform;
+        if (rt == null) go.AddComponent<RectTransform>();
+        go.layer = layerValue;
+
+        for (int i = 0; i < go.transform.childCount; i++)
+        {
+            SetUILayer(go.transform.GetChild(i).gameObject, layerValue);
+
+        }
+    }
+}

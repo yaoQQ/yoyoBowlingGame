@@ -1,0 +1,50 @@
+﻿local ImageWidget=CS.ImageWidget
+local IconWidget=CS.IconWidget
+local PanelWidget=CS.PanelWidget
+
+Mid_eliminate_pool_panel={}
+local this = Mid_eliminate_pool_panel
+
+function this:new(gameObject)
+	local o = { }
+	setmetatable(o, self)
+	self.__index = self
+	o:init(gameObject)
+	return o
+end
+
+this.go = nil
+this.pieceBgItem=nil
+this.pieceBg_fg_image=nil
+this.normalList=nil
+this.eliminateList=nil
+this.specialList=nil
+this.selectedList=nil
+this.pieceBg_pool_root=nil
+this.piece_pool_root=nil
+this.pieceItem=nil
+this.evaluateList=nil
+this.timerList=nil
+this.itemList=nil
+this.itemItem=nil
+this.mat_image=nil
+
+function this:init(gameObject)
+	self.go=gameObject
+	self.pieceBgItem=self.go.transform:Find("pieceBgItem"):GetComponent(typeof(ImageWidget))
+	self.pieceBg_fg_image=self.go.transform:Find("pieceBgItem/pieceBg_fg_image"):GetComponent(typeof(ImageWidget))
+	self.normalList=self.go.transform:Find("normalList"):GetComponent(typeof(IconWidget))
+	self.eliminateList=self.go.transform:Find("eliminateList"):GetComponent(typeof(IconWidget))
+	self.specialList=self.go.transform:Find("specialList"):GetComponent(typeof(IconWidget))
+	self.selectedList=self.go.transform:Find("selectedList"):GetComponent(typeof(IconWidget))
+	self.pieceBg_pool_root=self.go.transform:Find("pieceBg_pool_root"):GetComponent(typeof(PanelWidget))
+	self.piece_pool_root=self.go.transform:Find("piece_pool_root"):GetComponent(typeof(PanelWidget))
+	self.pieceItem=self.go.transform:Find("pieceItem"):GetComponent(typeof(ImageWidget))
+	self.evaluateList=self.go.transform:Find("evaluateList"):GetComponent(typeof(IconWidget))
+	self.timerList=self.go.transform:Find("timerList"):GetComponent(typeof(IconWidget))
+	self.itemList=self.go.transform:Find("itemList"):GetComponent(typeof(IconWidget))
+	self.itemItem=self.go.transform:Find("itemItem"):GetComponent(typeof(ImageWidget))
+	self.mat_image=self.go.transform:Find("mat_image"):GetComponent(typeof(ImageWidget))
+end
+
+

@@ -1,0 +1,78 @@
+﻿using UnityEngine;
+using System.Collections;
+using System;
+using UnityEngine.EventSystems;
+using System.Collections.Generic;
+using Spine;
+
+public abstract class UIBaseWidget : UIBehaviour, ICanvasRaycastFilter
+{
+
+    public bool exportSign;
+
+    public bool ignoreEventSign;
+
+
+    private RectTransform m_rectTransform;
+    public RectTransform rectTransform
+    {
+        get
+        {
+            if (m_rectTransform == null)
+                m_rectTransform = GetComponent<RectTransform>();
+            return m_rectTransform ?? this.transform as RectTransform;
+        }
+    }
+
+    public DynamicUIWidget DynamicUI
+    {
+        get { return GetComponent<DynamicUIWidget>(); }
+    }
+
+    public abstract WidgetType GetWidgetType();
+
+
+    protected bool IsInitSetFarBase;
+    protected Vector3 FarAwayBaseVector3;
+    [HideInInspector]
+    public bool IsBaeFarAway;
+    public void BaseSetFarAway(bool isFar)
+    {
+        if (!IsInitSetFarBase)
+        {
+            FarAwayBaseVector3 = transform.localPosition;
+            IsInitSetFarBase = true;
+        }
+        if (!isFar && !gameObject.activeInHierarchy)
+        {
+            gameObject.SetActive(true);
+        }
+        transform.localPosition = isFar ? Vector3.one * -10000 : FarAwayBaseVector3;
+        IsBaeFarAway = isFar;
+    }
+
+    public bool IsRaycastLocationValid(Vector2 sp, Camera eventCamera)
+    {
+        return !ignoreEventSign;
+    }
+
+    public abstract bool AddEventListener(UIEvent eventType, Action<PointerEventData> onEventHandler);
+    public abstract bool RemoveEventListener(UIEvent eventType, Action<PointerEventData> onEventHandler);
+
+
+    public virtual bool AddCustomEventListener(UICustomEvent eventType, Action<object> onEventHandler)
+    {
+        return false;
+    }
+
+    public virtual bool AddMoreCustomEventListener(UIEvent eventType, Action<List<object>> onEventHandler)
+    {
+        return false;
+    }
+
+    public virtual bool AddSpineCustomEventListener(UISpineEvent eventType, Action<object> onEventHandler)
+    {
+        return false;
+    }
+
+}

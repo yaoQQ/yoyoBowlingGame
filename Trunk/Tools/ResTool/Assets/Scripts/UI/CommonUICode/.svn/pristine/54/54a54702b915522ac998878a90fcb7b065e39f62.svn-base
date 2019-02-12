@@ -1,0 +1,116 @@
+﻿using UnityEngine;
+using System;
+using UnityEngine.EventSystems;
+using UnityEngine.UI;
+#if !TOOL
+using XLua;
+
+[LuaCallCSharp]
+#endif
+public class ImageWidget : UIBaseWidget
+{
+    [SerializeField]
+    public Image Img;
+
+    public bool defaultModeSign = false;
+    public Sprite defaultPng;
+
+    public Material grayMaterial;
+    private bool m_activeGray = false;
+    public bool activeGray
+    {
+        get { return this.m_activeGray; }
+
+        set
+        {
+            m_activeGray = value;
+            if (m_activeGray)
+            {
+                if (this.Img != null && this.grayMaterial != null)
+                {
+                    this.Img.material = this.grayMaterial;
+                }
+            }
+            else
+            {
+                if (this.Img != null)
+                {
+                    this.Img.material = null;
+                }
+            }
+
+        }
+    }
+    public override bool AddEventListener(UIEvent eventType, Action<PointerEventData> onEventHandler)
+    {
+        bool sign = true;
+        switch (eventType)
+        {
+            case UIEvent.PointerClick:
+                PointerClickListener.Get(gameObject).onHandler = onEventHandler;
+                break;
+            case UIEvent.PointerDown:
+                PointerDownListener.Get(gameObject).onHandler = onEventHandler;
+                break;
+            default:
+                sign = false;
+                break;
+        }
+        return sign;
+    }
+
+    public bool AddTriggerListener(UIEvent eventType, Action<Collider2D> onTriggerHandler)
+    {
+
+        bool sign = true;
+        switch (eventType)
+        {
+            case UIEvent.TriggleEnter:
+                TriggerEnterListener.Get(gameObject).onHandler = onTriggerHandler;
+                break;
+            default:
+                sign = false;
+                break;
+        }
+        return sign;
+    }
+
+    public override WidgetType GetWidgetType()
+    {
+        return WidgetType.Image;
+    }
+
+    public void reset()
+    {
+        Img.sprite = null;
+        Img.enabled = false;
+        Color oldC = Img.color;
+    }
+    void Awake()
+    {
+        //if (defaultModeSign)
+        //{
+        //    reset();
+        //}
+        //if (Img.sprite == null) Img.enabled = false;
+    }
+
+    public void SetPng(Sprite sprite, float aValue = 1f)
+    {
+        Img.sprite = sprite;
+        Color oldC = Img.color;
+        if (defaultModeSign && sprite == null)
+        {
+            Img.sprite = defaultPng;
+        }
+        //Debug.LogFormat("+++++++++++++++++++进入了默认图片设置操作！++++++++{0}",Img.sprite);
+        Img.enabled = Img.sprite == null ? false : true;
+        Img.color = new Color(oldC.r, oldC.g, oldC.b, aValue);
+    }
+
+    public void SetPngEnabled(bool sign)
+    {
+        Img.enabled = sign;
+    }
+
+}

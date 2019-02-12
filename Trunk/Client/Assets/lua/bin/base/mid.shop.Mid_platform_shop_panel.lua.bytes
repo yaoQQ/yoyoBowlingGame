@@ -1,0 +1,252 @@
+local PanelWidget=CS.PanelWidget
+local ButtonWidget=CS.ButtonWidget
+local ImageWidget=CS.ImageWidget
+local TextWidget=CS.TextWidget
+local IconWidget=CS.IconWidget
+local AnimationWidget=CS.AnimationWidget
+local EmptyImageWidget=CS.EmptyImageWidget
+local HorizontalLayoutGroupWidget=CS.HorizontalLayoutGroupWidget
+local GridLayoutGroupWidget=CS.GridLayoutGroupWidget
+local CellRecycleScrollWidget=CS.CellRecycleScrollWidget
+local InputFieldWidget=CS.InputFieldWidget
+local CircleImageWidget=CS.CircleImageWidget
+
+Mid_platform_shop_panel={}
+local this = Mid_platform_shop_panel
+
+function this:new(gameObject)
+	local o = { }
+	setmetatable(o, self)
+	self.__index = self
+	o:init(gameObject)
+	return o
+end
+
+this.go = nil
+this.pressPanel=nil
+this.ActivityBtnList=nil
+this.activityBgImage=nil
+this.curShortClassTxt=nil
+this.activitybg=nil
+this.activityMembers=nil
+this.activityText=nil
+this.search_button=nil
+this.activityChildBtnList=nil
+this.curClassTxttitle=nil
+this.curDetailClassTxt=nil
+this.chooseIcon=nil
+this.ActivityBtnList0=nil
+this.ActivityBtnList0bg=nil
+this.ActivityBtnList0txt=nil
+this.ActivityBtnList1=nil
+this.ActivityBtnList1bg=nil
+this.ActivityBtnList1txt=nil
+this.ActivityBtnList2=nil
+this.ActivityBtnList2bg=nil
+this.ActivityBtnList2txt=nil
+this.ActivityBtnList3=nil
+this.ActivityBtnList3bg=nil
+this.ActivityBtnList3txt=nil
+this.ActivityBtnList4=nil
+this.ActivityBtnList4bg=nil
+this.ActivityBtnList4txt=nil
+this.RefreshIcon=nil
+this.detailmembersParent=nil
+this.detailactivityMembers=nil
+this.detailactivityText=nil
+this.detail_search_button=nil
+this.arrowIconPress=nil
+this.arrowIcon=nil
+this.cityPanel=nil
+this.cityItem=nil
+this.Normalcitybg=nil
+this.Normalcityname=nil
+this.history_Panel=nil
+this.historyCityGroup=nil
+this.hotcity_Panel=nil
+this.HotCityGroup=nil
+this.enterActivity=nil
+this.enterActivitybg=nil
+this.activity_count_text=nil
+this.BtnBackMyPos=nil
+this.attention_game_panel=nil
+this.attention_game_txt=nil
+this.close_attention=nil
+this.recommend_game_txt=nil
+this.attentionGame=nil
+this.search_Inputfield=nil
+this.search_Text=nil
+this.scan_Button=nil
+this.city_button=nil
+this.city_arrow=nil
+this.mid_scratch_Panel=nil
+this.Parent=nil
+this.game_recycle_scroll=nil
+this.shop_list_CellRecycleScrollPanel=nil
+this.shop_count_do_button=nil
+this.shop_count_do_button_Txt=nil
+this.no_activity_Text=nil
+this.isStartGame_parent=nil
+this.isStartGame_press=nil
+this.timesbg=nil
+this.redpoint_bg=nil
+this.times=nil
+this.noneArrow=nil
+--AttentionList数组
+this.attentionListArr={}
+--Shopactivitylistcell数组
+this.shopactivitylistcellArr={}
+--Shoplistcell数组
+this.shoplistcellArr={}
+
+function this:init(gameObject)
+	self.go=gameObject
+	self.pressPanel=self.go.transform:Find("pressPanel"):GetComponent(typeof(PanelWidget))
+	self.ActivityBtnList=self.go.transform:Find("ActivityBtnList"):GetComponent(typeof(ButtonWidget))
+	self.activityBgImage=self.go.transform:Find("ActivityBtnList/activityBgImage"):GetComponent(typeof(ImageWidget))
+	self.curShortClassTxt=self.go.transform:Find("ActivityBtnList/activityBgImage/curShortClassTxt"):GetComponent(typeof(TextWidget))
+	self.activitybg=self.go.transform:Find("ActivityBtnList/activityBgImage/activitybg"):GetComponent(typeof(IconWidget))
+	self.activityMembers=self.go.transform:Find("ActivityBtnList/activityBgImage/activityMembers"):GetComponent(typeof(ImageWidget))
+	self.activityText=self.go.transform:Find("ActivityBtnList/activityBgImage/activityMembers/activityText"):GetComponent(typeof(TextWidget))
+	self.search_button=self.go.transform:Find("ActivityBtnList/activityBgImage/search_button"):GetComponent(typeof(ButtonWidget))
+	self.activityChildBtnList=self.go.transform:Find("ListPanelMask/activityChildBtnList"):GetComponent(typeof(AnimationWidget))
+	self.curClassTxttitle=self.go.transform:Find("ListPanelMask/activityChildBtnList/curClassTxttitle"):GetComponent(typeof(TextWidget))
+	self.curDetailClassTxt=self.go.transform:Find("ListPanelMask/activityChildBtnList/curClassTxttitle/curDetailClassTxt"):GetComponent(typeof(TextWidget))
+	self.chooseIcon=self.go.transform:Find("ListPanelMask/activityChildBtnList/chooseIcon"):GetComponent(typeof(ImageWidget))
+	self.ActivityBtnList0=self.go.transform:Find("ListPanelMask/activityChildBtnList/ActivityBtnList0"):GetComponent(typeof(ButtonWidget))
+	self.ActivityBtnList0bg=self.go.transform:Find("ListPanelMask/activityChildBtnList/ActivityBtnList0/ActivityBtnList0bg"):GetComponent(typeof(IconWidget))
+	self.ActivityBtnList0txt=self.go.transform:Find("ListPanelMask/activityChildBtnList/ActivityBtnList0/ActivityBtnList0txt"):GetComponent(typeof(TextWidget))
+	self.ActivityBtnList1=self.go.transform:Find("ListPanelMask/activityChildBtnList/ActivityBtnList1"):GetComponent(typeof(ButtonWidget))
+	self.ActivityBtnList1bg=self.go.transform:Find("ListPanelMask/activityChildBtnList/ActivityBtnList1/ActivityBtnList1bg"):GetComponent(typeof(IconWidget))
+	self.ActivityBtnList1txt=self.go.transform:Find("ListPanelMask/activityChildBtnList/ActivityBtnList1/ActivityBtnList1txt"):GetComponent(typeof(TextWidget))
+	self.ActivityBtnList2=self.go.transform:Find("ListPanelMask/activityChildBtnList/ActivityBtnList2"):GetComponent(typeof(ButtonWidget))
+	self.ActivityBtnList2bg=self.go.transform:Find("ListPanelMask/activityChildBtnList/ActivityBtnList2/ActivityBtnList2bg"):GetComponent(typeof(IconWidget))
+	self.ActivityBtnList2txt=self.go.transform:Find("ListPanelMask/activityChildBtnList/ActivityBtnList2/ActivityBtnList2txt"):GetComponent(typeof(TextWidget))
+	self.ActivityBtnList3=self.go.transform:Find("ListPanelMask/activityChildBtnList/ActivityBtnList3"):GetComponent(typeof(ButtonWidget))
+	self.ActivityBtnList3bg=self.go.transform:Find("ListPanelMask/activityChildBtnList/ActivityBtnList3/ActivityBtnList3bg"):GetComponent(typeof(IconWidget))
+	self.ActivityBtnList3txt=self.go.transform:Find("ListPanelMask/activityChildBtnList/ActivityBtnList3/ActivityBtnList3txt"):GetComponent(typeof(TextWidget))
+	self.ActivityBtnList4=self.go.transform:Find("ListPanelMask/activityChildBtnList/ActivityBtnList4"):GetComponent(typeof(ButtonWidget))
+	self.ActivityBtnList4bg=self.go.transform:Find("ListPanelMask/activityChildBtnList/ActivityBtnList4/ActivityBtnList4bg"):GetComponent(typeof(IconWidget))
+	self.ActivityBtnList4txt=self.go.transform:Find("ListPanelMask/activityChildBtnList/ActivityBtnList4/ActivityBtnList4txt"):GetComponent(typeof(TextWidget))
+	self.RefreshIcon=self.go.transform:Find("ListPanelMask/activityChildBtnList/RefreshIcon"):GetComponent(typeof(EmptyImageWidget))
+	self.detailmembersParent=self.go.transform:Find("ListPanelMask/activityChildBtnList/detailmembersParent"):GetComponent(typeof(EmptyImageWidget))
+	self.detailactivityMembers=self.go.transform:Find("ListPanelMask/activityChildBtnList/detailmembersParent/detailactivityMembers"):GetComponent(typeof(ImageWidget))
+	self.detailactivityText=self.go.transform:Find("ListPanelMask/activityChildBtnList/detailmembersParent/detailactivityMembers/detailactivityText"):GetComponent(typeof(TextWidget))
+	self.detail_search_button=self.go.transform:Find("ListPanelMask/activityChildBtnList/detail_search_button"):GetComponent(typeof(ImageWidget))
+	self.arrowIconPress=self.go.transform:Find("arrowIconPress"):GetComponent(typeof(EmptyImageWidget))
+	self.arrowIcon=self.go.transform:Find("arrowIconPress/arrowIcon"):GetComponent(typeof(IconWidget))
+	self.cityPanel=self.go.transform:Find("cityPanel"):GetComponent(typeof(PanelWidget))
+	self.cityItem=self.go.transform:Find("cityPanel/cityItem"):GetComponent(typeof(EmptyImageWidget))
+	self.Normalcitybg=self.go.transform:Find("cityPanel/cityItem/Normalcitybg"):GetComponent(typeof(ImageWidget))
+	self.Normalcityname=self.go.transform:Find("cityPanel/cityItem/Normalcitybg/Normalcityname"):GetComponent(typeof(TextWidget))
+	self.history_Panel=self.go.transform:Find("cityPanel/Panel/history_Panel"):GetComponent(typeof(PanelWidget))
+	self.historyCityGroup=self.go.transform:Find("cityPanel/Panel/history_Panel/historyCityGroup"):GetComponent(typeof(HorizontalLayoutGroupWidget))
+	self.hotcity_Panel=self.go.transform:Find("cityPanel/Panel/hotcity_Panel"):GetComponent(typeof(PanelWidget))
+	self.HotCityGroup=self.go.transform:Find("cityPanel/Panel/hotcity_Panel/HotCityGroup"):GetComponent(typeof(GridLayoutGroupWidget))
+	self.enterActivity=self.go.transform:Find("enterActivity"):GetComponent(typeof(EmptyImageWidget))
+	self.enterActivitybg=self.go.transform:Find("enterActivity/enterActivitybg"):GetComponent(typeof(ImageWidget))
+	self.activity_count_text=self.go.transform:Find("enterActivity/activity_count_text"):GetComponent(typeof(TextWidget))
+	self.BtnBackMyPos=self.go.transform:Find("BtnBackMyPos"):GetComponent(typeof(ButtonWidget))
+	self.attention_game_panel=self.go.transform:Find("attention_game_panel"):GetComponent(typeof(PanelWidget))
+	self.attention_game_txt=self.go.transform:Find("attention_game_panel/attention_game_txt"):GetComponent(typeof(TextWidget))
+	self.close_attention=self.go.transform:Find("attention_game_panel/close_attention"):GetComponent(typeof(ImageWidget))
+	self.recommend_game_txt=self.go.transform:Find("attention_game_panel/recommend_game_txt"):GetComponent(typeof(TextWidget))
+	self.attentionGame=self.go.transform:Find("attention_game_panel/attentionGame"):GetComponent(typeof(CellRecycleScrollWidget))
+	self.search_Inputfield=self.go.transform:Find("top_Panel/search_Inputfield"):GetComponent(typeof(InputFieldWidget))
+	self.search_Text=self.go.transform:Find("top_Panel/search_Inputfield/search_Text"):GetComponent(typeof(TextWidget))
+	self.scan_Button=self.go.transform:Find("top_Panel/scan_Button"):GetComponent(typeof(EmptyImageWidget))
+	self.city_button=self.go.transform:Find("top_Panel/city_button"):GetComponent(typeof(ButtonWidget))
+	self.city_arrow=self.go.transform:Find("top_Panel/city_button/city_arrow"):GetComponent(typeof(ImageWidget))
+	self.mid_scratch_Panel=self.go.transform:Find("mid_scratch_Panel"):GetComponent(typeof(PanelWidget))
+	self.Parent=self.go.transform:Find("mid_scratch_Panel/Parent"):GetComponent(typeof(ImageWidget))
+	self.game_recycle_scroll=self.go.transform:Find("mid_scratch_Panel/Parent/game_recycle_scroll"):GetComponent(typeof(CellRecycleScrollWidget))
+	self.shop_list_CellRecycleScrollPanel=self.go.transform:Find("mid_scratch_Panel/Parent/shop_list_CellRecycleScrollPanel"):GetComponent(typeof(CellRecycleScrollWidget))
+	self.shop_count_do_button=self.go.transform:Find("mid_scratch_Panel/Parent/shop_count_do_button"):GetComponent(typeof(EmptyImageWidget))
+	self.shop_count_do_button_Txt=self.go.transform:Find("mid_scratch_Panel/Parent/shop_count_do_button/shop_count_do_button_Txt"):GetComponent(typeof(TextWidget))
+	self.no_activity_Text=self.go.transform:Find("mid_scratch_Panel/Parent/no_activity_Text"):GetComponent(typeof(TextWidget))
+	self.isStartGame_parent=self.go.transform:Find("isStartGame_parent"):GetComponent(typeof(EmptyImageWidget))
+	self.isStartGame_press=self.go.transform:Find("isStartGame_parent/isStartGame_press"):GetComponent(typeof(EmptyImageWidget))
+	self.timesbg=self.go.transform:Find("isStartGame_parent/timesbg"):GetComponent(typeof(IconWidget))
+	self.redpoint_bg=self.go.transform:Find("isStartGame_parent/redpoint_bg"):GetComponent(typeof(ImageWidget))
+	self.times=self.go.transform:Find("isStartGame_parent/redpoint_bg/times"):GetComponent(typeof(TextWidget))
+	self.noneArrow=self.go.transform:Find("isStartGame_parent/noneArrow"):GetComponent(typeof(ImageWidget))
+	self.attentionListArr={}
+	table.insert(self.attentionListArr,self.new_AttentionList(self.go.transform:Find("attention_game_panel/attentionGame/content/cellitem").gameObject))
+	table.insert(self.attentionListArr,self.new_AttentionList(self.go.transform:Find("attention_game_panel/attentionGame/content/cellitem_1").gameObject))
+	table.insert(self.attentionListArr,self.new_AttentionList(self.go.transform:Find("attention_game_panel/attentionGame/content/cellitem_2").gameObject))
+	table.insert(self.attentionListArr,self.new_AttentionList(self.go.transform:Find("attention_game_panel/attentionGame/content/cellitem_3").gameObject))
+	table.insert(self.attentionListArr,self.new_AttentionList(self.go.transform:Find("attention_game_panel/attentionGame/content/cellitem_4").gameObject))
+	table.insert(self.attentionListArr,self.new_AttentionList(self.go.transform:Find("attention_game_panel/attentionGame/content/cellitem_5").gameObject))
+	self.shopactivitylistcellArr={}
+	table.insert(self.shopactivitylistcellArr,self.new_Shopactivitylistcell(self.go.transform:Find("mid_scratch_Panel/Parent/game_recycle_scroll/content/cellitem").gameObject))
+	table.insert(self.shopactivitylistcellArr,self.new_Shopactivitylistcell(self.go.transform:Find("mid_scratch_Panel/Parent/game_recycle_scroll/content/cellitem_1").gameObject))
+	table.insert(self.shopactivitylistcellArr,self.new_Shopactivitylistcell(self.go.transform:Find("mid_scratch_Panel/Parent/game_recycle_scroll/content/cellitem_2").gameObject))
+	table.insert(self.shopactivitylistcellArr,self.new_Shopactivitylistcell(self.go.transform:Find("mid_scratch_Panel/Parent/game_recycle_scroll/content/cellitem_3").gameObject))
+	table.insert(self.shopactivitylistcellArr,self.new_Shopactivitylistcell(self.go.transform:Find("mid_scratch_Panel/Parent/game_recycle_scroll/content/cellitem_4").gameObject))
+	table.insert(self.shopactivitylistcellArr,self.new_Shopactivitylistcell(self.go.transform:Find("mid_scratch_Panel/Parent/game_recycle_scroll/content/cellitem_5").gameObject))
+	table.insert(self.shopactivitylistcellArr,self.new_Shopactivitylistcell(self.go.transform:Find("mid_scratch_Panel/Parent/game_recycle_scroll/content/cellitem_6").gameObject))
+	table.insert(self.shopactivitylistcellArr,self.new_Shopactivitylistcell(self.go.transform:Find("mid_scratch_Panel/Parent/game_recycle_scroll/content/cellitem_7").gameObject))
+	self.shoplistcellArr={}
+	table.insert(self.shoplistcellArr,self.new_Shoplistcell(self.go.transform:Find("mid_scratch_Panel/Parent/shop_list_CellRecycleScrollPanel/content/cellitem").gameObject))
+	table.insert(self.shoplistcellArr,self.new_Shoplistcell(self.go.transform:Find("mid_scratch_Panel/Parent/shop_list_CellRecycleScrollPanel/content/cellitem_1").gameObject))
+	table.insert(self.shoplistcellArr,self.new_Shoplistcell(self.go.transform:Find("mid_scratch_Panel/Parent/shop_list_CellRecycleScrollPanel/content/cellitem_2").gameObject))
+	table.insert(self.shoplistcellArr,self.new_Shoplistcell(self.go.transform:Find("mid_scratch_Panel/Parent/shop_list_CellRecycleScrollPanel/content/cellitem_3").gameObject))
+	table.insert(self.shoplistcellArr,self.new_Shoplistcell(self.go.transform:Find("mid_scratch_Panel/Parent/shop_list_CellRecycleScrollPanel/content/cellitem_4").gameObject))
+end
+
+--AttentionList复用单元
+function this.new_AttentionList(itemGo)
+	local item = { }
+	item.go = itemGo
+	item.pressbg=itemGo.transform:Find("pressbg"):GetComponent(typeof(ImageWidget))
+	item.shop_head_image=itemGo.transform:Find("headBg/shop_head_image"):GetComponent(typeof(CircleImageWidget))
+	item.join_state_icon=itemGo.transform:Find("join_state_icon"):GetComponent(typeof(IconWidget))
+	item.get_state_icon=itemGo.transform:Find("get_state_icon"):GetComponent(typeof(IconWidget))
+	item.shop_name_text=itemGo.transform:Find("shop_name_text"):GetComponent(typeof(TextWidget))
+	item.shop_intro_text=itemGo.transform:Find("shop_intro_text"):GetComponent(typeof(TextWidget))
+	item.shop_opentime_title=itemGo.transform:Find("shop_opentime_title"):GetComponent(typeof(TextWidget))
+	item.shop_opentime_text=itemGo.transform:Find("shop_opentime_text"):GetComponent(typeof(TextWidget))
+	item.shop_rewardTitle_text=itemGo.transform:Find("shop_rewardTitle_text"):GetComponent(typeof(TextWidget))
+	item.reward_icon=itemGo.transform:Find("shop_reward_bg/Panel/reward_icon"):GetComponent(typeof(IconWidget))
+	item.shop_reward_text=itemGo.transform:Find("shop_reward_bg/Panel/shop_reward_text"):GetComponent(typeof(TextWidget))
+	item.game_icon=itemGo.transform:Find("game_icon"):GetComponent(typeof(ImageWidget))
+	item.game_name_text=itemGo.transform:Find("game_icon/game_name_text"):GetComponent(typeof(TextWidget))
+	item.officialgame_image=itemGo.transform:Find("officialgame_image"):GetComponent(typeof(ImageWidget))
+	return item
+end
+--Shopactivitylistcell复用单元
+function this.new_Shopactivitylistcell(itemGo)
+	local item = { }
+	item.go = itemGo
+	item.game_image=itemGo.transform:Find("game_image"):GetComponent(typeof(ImageWidget))
+	item.choose_togle=itemGo.transform:Find("game_image/choose_togle"):GetComponent(typeof(EmptyImageWidget))
+	return item
+end
+--Shoplistcell复用单元
+function this.new_Shoplistcell(itemGo)
+	local item = { }
+	item.go = itemGo
+	item.pressbg=itemGo.transform:Find("pressbg"):GetComponent(typeof(ImageWidget))
+	item.shop_intro_text=itemGo.transform:Find("shop_intro_text"):GetComponent(typeof(TextWidget))
+	item.non_local_offical_item=itemGo.transform:Find("non_local_offical_item"):GetComponent(typeof(EmptyImageWidget))
+	item.shop_head_image=itemGo.transform:Find("non_local_offical_item/headBg/shop_head_image"):GetComponent(typeof(CircleImageWidget))
+	item.shop_name_text=itemGo.transform:Find("non_local_offical_item/shop_name_text"):GetComponent(typeof(TextWidget))
+	item.shop_opentime_title=itemGo.transform:Find("non_local_offical_item/shop_opentime_title"):GetComponent(typeof(TextWidget))
+	item.shop_opentime_text=itemGo.transform:Find("non_local_offical_item/shop_opentime_text"):GetComponent(typeof(TextWidget))
+	item.shop_rewardTitle_text=itemGo.transform:Find("non_local_offical_item/shop_rewardTitle_text"):GetComponent(typeof(TextWidget))
+	item.reward_icon=itemGo.transform:Find("non_local_offical_item/shop_reward_bg/Panel/reward_icon"):GetComponent(typeof(IconWidget))
+	item.shop_reward_text=itemGo.transform:Find("non_local_offical_item/shop_reward_bg/Panel/shop_reward_text"):GetComponent(typeof(TextWidget))
+	item.officialgame_image=itemGo.transform:Find("non_local_offical_item/officialgame_image"):GetComponent(typeof(ImageWidget))
+	item.game_icon=itemGo.transform:Find("non_local_offical_item/game_icon"):GetComponent(typeof(ImageWidget))
+	item.game_name_text=itemGo.transform:Find("non_local_offical_item/game_icon/game_name_text"):GetComponent(typeof(TextWidget))
+	item.get_state_icon=itemGo.transform:Find("non_local_offical_item/get_state_icon"):GetComponent(typeof(IconWidget))
+	item.local_offical_item=itemGo.transform:Find("local_offical_item"):GetComponent(typeof(EmptyImageWidget))
+	item.local_intro_text=itemGo.transform:Find("local_offical_item/local_intro_text"):GetComponent(typeof(TextWidget))
+	item.local_time=itemGo.transform:Find("local_offical_item/local_time"):GetComponent(typeof(TextWidget))
+	item.local_stop_time=itemGo.transform:Find("local_offical_item/local_stop_time"):GetComponent(typeof(TextWidget))
+	item.count_time=itemGo.transform:Find("local_offical_item/time_bg/count_time"):GetComponent(typeof(TextWidget))
+	item.officialGameIcon=itemGo.transform:Find("local_offical_item/officialGameIconbg/officialGameIcon"):GetComponent(typeof(ImageWidget))
+	item.join_state_icon=itemGo.transform:Find("join_state_icon"):GetComponent(typeof(IconWidget))
+	return item
+end
+

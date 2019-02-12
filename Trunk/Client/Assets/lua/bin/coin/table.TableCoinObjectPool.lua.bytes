@@ -1,0 +1,18 @@
+TableCoinObjectPool = {data = {}}
+
+TableCoinObjectPool.m_isInit = false
+
+function TableCoinObjectPool.init()
+	if TableCoinObjectPool.m_isInit then
+		return
+	else
+		TableCoinObjectPool.data["q_fx_star_001"] = { keyName = "q_fx_star_001", projectName = "coin", path = "effect", defaultCount = 4}
+		TableCoinObjectPool.data["q_fx_souji_001"] = { keyName = "q_fx_souji_001", projectName = "coin", path = "effect", defaultCount = 1}
+		TableCoinObjectPool.m_isInit = true
+	end
+end
+
+function TableCoinObjectPool.clear()
+	TableCoinObjectPool.m_isInit = false
+	TableCoinObjectPool.data = {}
+end

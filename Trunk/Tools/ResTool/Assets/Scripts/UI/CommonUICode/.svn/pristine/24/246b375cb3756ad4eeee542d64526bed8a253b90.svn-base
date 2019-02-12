@@ -1,0 +1,91 @@
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.EventSystems;
+public class UIExClickListener : UIBehaviour, IPointerClickHandler, IPointerDownHandler, IPointerUpHandler
+{
+    [Tooltip("双击界定时间")]
+    public const float shortDefinition = 0.3f;
+    public static UIExClickListener Get(GameObject go)
+    {
+        UIExClickListener listener = go.GetComponent<UIExClickListener>();
+        if (listener == null) listener = go.AddComponent<UIExClickListener>();
+        return listener;
+    }
+
+
+    public Action<PointerEventData> onSingleHandler;
+    public Action<PointerEventData> onDoubleHandler;
+    public PointerEventData eventData;
+
+    private UIExLongClickListener longListener;
+
+    void LateUpdate()
+    {
+        if (downTimeQueue.Count > 0)
+        {
+            var lastTime = downTimeQueue.Peek();
+            var curTime = Time.unscaledTime;
+            var deltaTime = curTime - lastTime;
+            //Debug.Log("deltaTime = " + deltaTime);
+            if (deltaTime >= shortDefinition && downTimeQueue.Count == 1)
+            {
+                //Debug.Log("单击");
+                downTimeQueue.Clear();
+                if (longListener == null)
+                    longListener = GetComponent<UIExLongClickListener>();
+                if (longListener == null || !longListener.IsLongPressTriggered)
+                {
+                    if (onSingleHandler != null && eventData!= null) onSingleHandler.Invoke(this.eventData);
+                }
+
+            }
+            else if (deltaTime < shortDefinition && downTimeQueue.Count > 1)
+            {
+                //Debug.Log("双击");
+                downTimeQueue.Clear();
+                //if (onDoubleHandler != null && eventData != null)
+                //    onDoubleHandler.Invoke(eventData);
+            }
+        }
+    }
+    public void OnPointerClick(PointerEventData eventData)
+    {
+        //if (longListener == null)
+        //    longListener = GetComponent<UIExLongClickListener>();
+        //if (longListener == null || !longListener.IsLongPressTriggered)
+        //{
+        //    //if (eventData.clickCount == 1)
+        //    //    if (onSingleHandler != null) onSingleHandler.Invoke(eventData);
+
+
+        //}
+        if (downTimeQueue.Count < 2)
+        {
+            var time = Time.unscaledTime;
+            downTimeQueue.Enqueue(time);
+        }
+        if (eventData.clickCount == 2)
+            if (onDoubleHandler != null) onDoubleHandler.Invoke(eventData);
+    }
+    private Queue<float> downTimeQueue = new Queue<float>();
+
+    public void OnPointerDown(PointerEventData eventData)
+    {
+        Debug.Log(string.Format("点击按下. {0} {1}", gameObject.name, eventData.pointerPressRaycast.gameObject.name));
+        this.eventData = eventData;
+        //if (downTimeQueue.Count < 2)
+        //{
+        //    var time = Time.unscaledTime;
+        //    downTimeQueue.Enqueue(time);
+        //}
+    }
+
+    public void OnPointerUp(PointerEventData eventData)
+    {
+        //throw new NotImplementedException();
+    }
+
+
+}

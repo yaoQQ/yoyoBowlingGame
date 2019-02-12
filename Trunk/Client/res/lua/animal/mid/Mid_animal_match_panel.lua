@@ -1,0 +1,46 @@
+﻿local IconWidget=CS.IconWidget
+local TextWidget=CS.TextWidget
+local SliderWidget=CS.SliderWidget
+local CircleImageWidget=CS.CircleImageWidget
+local ImageWidget=CS.ImageWidget
+
+Mid_animal_match_panel={}
+local this = Mid_animal_match_panel
+
+function this:new(gameObject)
+	local o = { }
+	setmetatable(o, self)
+	self.__index = self
+	o:init(gameObject)
+	return o
+end
+
+this.go = nil
+this.match_bg_icon=nil
+this.match_tip_text=nil
+this.Slider=nil
+this.load_tip_text=nil
+--PlayerItem数组
+this.playerItemArr={}
+
+function this:init(gameObject)
+	self.go=gameObject
+	self.match_bg_icon=self.go.transform:Find("match_bg_icon"):GetComponent(typeof(IconWidget))
+	self.match_tip_text=self.go.transform:Find("match_tip_text"):GetComponent(typeof(TextWidget))
+	self.Slider=self.go.transform:Find("Slider"):GetComponent(typeof(SliderWidget))
+	self.load_tip_text=self.go.transform:Find("load_tip_text"):GetComponent(typeof(TextWidget))
+	self.playerItemArr={}
+	table.insert(self.playerItemArr,self.new_PlayerItem(self.go.transform:Find("match_bg_icon/CellGroup/CellItem").gameObject))
+	table.insert(self.playerItemArr,self.new_PlayerItem(self.go.transform:Find("match_bg_icon/CellGroup/CellItem_1").gameObject))
+end
+
+--PlayerItem复用单元
+function this.new_PlayerItem(itemGo)
+	local item = { }
+	item.go = itemGo
+	item.portrait_image=itemGo.transform:Find("Image/portrait_image"):GetComponent(typeof(CircleImageWidget))
+	item.name_bg=itemGo.transform:Find("name_bg"):GetComponent(typeof(ImageWidget))
+	item.name_text=itemGo.transform:Find("name_bg/name_text"):GetComponent(typeof(TextWidget))
+	return item
+end
+

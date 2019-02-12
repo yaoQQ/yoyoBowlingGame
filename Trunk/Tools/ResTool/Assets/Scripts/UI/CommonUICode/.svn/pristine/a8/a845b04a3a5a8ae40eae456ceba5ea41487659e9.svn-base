@@ -1,0 +1,531 @@
+﻿using UnityEngine;
+using System;
+using UnityEngine.EventSystems;
+using System.Collections.Generic;
+using UnityEngine.UI;
+using System.Linq;
+using System.Collections;
+#if !TOOL
+
+using XLua;
+
+[LuaCallCSharp]
+#else
+[ExecuteInEditMode]
+
+#endif
+[DisallowMultipleComponent]
+[RequireComponent(typeof(RectTransform))]
+public partial class BannerWidget : IEventSystemHandler, IBeginDragHandler, IInitializePotentialDragHandler, IDragHandler, IEndDragHandler
+{
+    [SerializeField]
+    private float m_Elasticity = 0.1f;
+    public float elasticity { get { return m_Elasticity; } set { m_Elasticity = value; } }
+
+
+    public RectMask2D mask;
+
+    [SerializeField]
+    private RectTransform m_Content;
+    public RectTransform content { get { return m_Content; } set { m_Content = value; } }
+    [SerializeField]
+    private RectTransform m_Viewport;
+    public RectTransform viewport { get { return m_Viewport; } set { m_Viewport = value; } }
+    private RectTransform m_ViewRect;
+    [SerializeField]
+    private bool m_Horizontal = true;
+    public bool horizontal { get { return m_Horizontal; } set { m_Horizontal = value; } }
+
+    [SerializeField]
+    private Vector2 m_cellSize = new Vector2(300, 100);
+    public Vector2 CellSize
+    {
+        get { return m_cellSize; }
+        set
+        {
+            m_cellSize = value;
+
+        }
+    }
+    [SerializeField]
+    public float m_spaceX = 0f;
+    public float SpaceX
+    {
+        get { return m_spaceX; }
+        set
+        {
+            m_spaceX = value;
+        }
+    }
+
+    //[SerializeField]
+    private bool m_Vertical = false;
+    private bool vertical
+    {
+        get { return m_Vertical; }
+        set
+        {
+            m_Vertical = value;
+        }
+    }
+    protected RectTransform viewRect
+    {
+        get
+        {
+            if (m_ViewRect == null)
+                m_ViewRect = m_Viewport;
+            if (m_ViewRect == null)
+                m_ViewRect = (RectTransform)transform;
+            return m_ViewRect;
+        }
+    }
+    private Bounds m_ViewBounds;
+    protected Bounds m_ContentBounds;
+    private Vector2 m_PrevPosition = Vector2.zero;
+    private Bounds m_PrevContentBounds;
+    private Bounds m_PrevViewBounds;
+    private Vector2 m_Velocity;
+    public Vector2 velocity { get { return m_Velocity; } set { m_Velocity = value; } }
+
+    /// <summary>
+    /// 自动切换开关
+    /// </summary>
+    public bool autoSwitch = false;
+    public float autoSwitchTime = 1f;
+    private bool m_isAutoMoveContont = false;
+    private float beginDragTime;
+    private float endDragTime;
+    private const float quickDragTimespan = 0.01f;
+    private bool m_Dragging;
+    private bool m_isCanDrag = true;
+    private Vector2 m_PointerStartLocalCursor = Vector2.zero;
+    protected Vector2 m_ContentStartPosition = Vector2.zero;
+
+    /// <summary>
+    /// 视图数据
+    /// </summary>
+    private List<RectTransform> viewList = new List<RectTransform>();
+    private Dictionary<int, float> index2contentPosDic = new Dictionary<int, float>();
+
+    private GameObject BannerItem;
+    public void SetBannerData(List<object> p_dataList, int dataIndex, Action<GameObject, object, int> p_onUpdateCellData, bool isAutoSwitch = false, float autoSwitchTime = 1f)
+    {
+        if (p_dataList == null)
+        {
+            Debug.LogError("Baner设置数据错误, p_dataList == null");
+            return;
+        }
+        if (dataIndex < 0 || dataIndex >= p_dataList.Count)
+        {
+            Debug.LogError("Baner设置数据错误, curIndex越界");
+            return;
+        }
+        dataList.Clear();
+        dataList = p_dataList;
+        BannerItem = this.content.GetChild(0).gameObject;
+        if (BannerItem == null)
+        {
+            Debug.LogError("Baner设置数据错误, BannerItem == null");
+            return;
+        }
+        m_isCanDrag = !(p_dataList.Count == 1) && !isAutoSwitch;
+        this.autoSwitchTime = autoSwitchTime;
+        this.autoSwitch = isAutoSwitch;
+        InitViewByCount(p_dataList.Count);
+        //int offset = viewList.Count - dataList.Count;
+        this.startIndex = dataIndex;
+        SetContentPosByIndex(dataIndex);
+        for (var i = 0; i < viewList.Count; i++)
+        {
+            p_onUpdateCellData(viewList[i].gameObject, dataList[i], i);
+        }
+    }
+
+    public void EditContent()
+    {
+        this.viewport.sizeDelta = this.m_cellSize;
+        var cellCount = content.childCount;
+        var unitW = m_Viewport.sizeDelta.x;
+        var unitH = m_Viewport.sizeDelta.y;
+        this.content.sizeDelta = new Vector2(unitW * cellCount, unitH) + new Vector2((cellCount - 1) * m_spaceX, 0);
+        for (var i = 0; i < content.childCount; i++)
+        {
+            var rt = (RectTransform)content.GetChild(i);
+            var x = (-content.sizeDelta.x / 2 + this.m_cellSize.x / 2) + this.m_cellSize.x * i + i * m_spaceX;
+            rt.anchoredPosition = new Vector2(x, 0);
+        }
+    }
+    private void InitViewByCount(int dataCount)
+    {
+        UpdateBounds();
+        if (this.content == null || this.viewport == null)
+            return;
+        //var viewCount = Mathf.Clamp(dataCount, dataCount, content.childCount);
+        var viewCount = dataCount;
+        this.viewport.sizeDelta = this.m_cellSize;
+        var unitW = m_Viewport.sizeDelta.x;
+        var unitH = m_Viewport.sizeDelta.y;
+        this.content.sizeDelta = new Vector2(unitW * viewCount, unitH) + new Vector2((viewCount - 1) * m_spaceX, 0);
+        viewList.Clear();
+        index2contentPosDic.Clear();
+        // 设置每个item的初始位置, 以及记录content与每个item的对应关系 
+        var childCount = content.childCount;
+        for (var i = 0; i < viewCount; i++)
+        {
+            RectTransform rt;
+            if (i < childCount)
+            {
+                rt = (RectTransform)content.GetChild(i);
+            }
+            else
+            {
+                rt = Instantiate(BannerItem, content).transform as RectTransform;
+            }
+            rt.gameObject.name = string.Format("{0}_{1}", "bannerItem", i);
+            rt.gameObject.SetActive(true);
+            viewList.Add(rt);
+            var x = (-content.sizeDelta.x / 2 + this.m_cellSize.x / 2) + this.m_cellSize.x * i + i * m_spaceX;
+            var keyX = -x;
+            rt.anchoredPosition = new Vector2(x, 0);
+            index2contentPosDic.Add(i, keyX);
+        }
+        if (viewCount < childCount)
+        {
+            for (var i = viewCount; i < childCount; i++)
+            {
+                var rt = (RectTransform)content.GetChild(i);
+                if (rt)
+                    rt.gameObject.SetActive(false);
+            }
+        }
+    }
+
+    private void SetContentPosByIndex(int dataIndex)
+    {
+        var targetX = index2contentPosDic[dataIndex];
+        var finalPos = new Vector2(targetX, 0);
+        SetContentAnchoredPosition(finalPos);
+
+    }
+    protected override void Start()
+    {
+        //var list = new List<object> { 1, 2, 3 };
+        //SetBannerData(list, 2, (go, data, index) =>
+        //{
+        //    var imageWiget = go.GetComponent<ImageWidget>();
+        //    imageWiget.AddEventListener(UIEvent.PointerClick, (eventData) => { Debug.Log("点击了" + index); });
+        //}, false, 2f);
+    }
+
+    protected virtual void LateUpdate()
+    {
+        if (!Application.isPlaying)
+            return;
+        if (!m_Content)
+            return;
+
+        UpdateBounds();
+        float deltaTime = Time.unscaledDeltaTime;
+        Vector2 offset = CalculateOffset(Vector2.zero);
+        if (!m_Dragging && (offset != Vector2.zero || m_Velocity != Vector2.zero))
+        {
+            Vector2 position = m_Content.anchoredPosition;
+            for (int axis = 0; axis < 2; axis++)
+            {
+                if (offset[axis] != 0)
+                {
+                    float speed = m_Velocity[axis];
+                    position[axis] = Mathf.SmoothDamp(m_Content.anchoredPosition[axis], m_Content.anchoredPosition[axis] + offset[axis], ref speed, m_Elasticity, Mathf.Infinity, deltaTime);
+                    if (Mathf.Abs(speed) < 1)
+                        speed = 0;
+                    m_Velocity[axis] = speed;
+                }
+                else
+                {
+                    m_Velocity[axis] = 0;
+                }
+            }
+            SetContentAnchoredPosition(position);
+        }
+
+        if (m_ViewBounds != m_PrevViewBounds || m_ContentBounds != m_PrevContentBounds || m_Content.anchoredPosition != m_PrevPosition)
+        {
+            //Debug.Log("UpdatePrevData");
+            UpdatePrevData();
+        }
+
+
+        if (index2contentPosDic.Count == 0)
+            return;
+        if (!m_Dragging && m_isAutoMoveContont && offset == Vector2.zero)
+        {
+            if (!checkContentMoveEnd() && m_isCanDrag)
+            {
+                startIndex = FindNearIndex();
+                UpdateViewToIndex(startIndex);
+            }
+
+        }
+        if (!m_Dragging && !isMoveEnd)
+        {
+            if (checkContentMoveEnd())
+            {
+                //Debug.Log("移到完毕");
+                isMoveEnd = true;
+            }
+        }
+        if (autoSwitch && !m_isCanDrag)
+        {
+            var curTime = Time.unscaledTime;
+
+            if (curTime - preSwitchTime >= autoSwitchTime)
+            {
+                preSwitchTime = Time.unscaledTime;
+                if (this.startIndex == dataList.Count - 1)
+                    isSwitchRight = false;
+                else if(this.startIndex == 0)
+                    isSwitchRight = true;
+                if(isSwitchRight)
+                    this.startIndex++;
+                else
+                    this.startIndex--;
+                this.startIndex = Mathf.Clamp(this.startIndex, 0, dataList.Count - 1);
+                //Debug.Log("targetIndex = " + this.startIndex);
+                isSwitching = true;
+
+            }
+            if (isSwitching)
+            {
+                UpdateViewToIndex(startIndex);
+            }
+        }
+    }
+    bool isMoveEnd = false;
+    float preSwitchTime = 0f;
+    bool isSwitching = false;
+    bool isSwitchRight = false;
+    private bool checkContentMoveEnd()
+    {
+
+        //startIndex = FindNearIndex();
+        var result = (int)m_Content.anchoredPosition.x % (int)(m_ViewBounds.size.x + m_spaceX);
+        var targetX = index2contentPosDic[startIndex];
+        var deltaX = Mathf.Abs(targetX - m_Content.anchoredPosition.x);
+        return deltaX < 0.1f;
+        //return result == 0;
+    }
+
+    void UpdateViewToIndex(int index)
+    {
+
+        var targetX = index2contentPosDic[index];
+
+        var curPos = m_Content.anchoredPosition;
+        var finalPos = new Vector2(targetX, 0);
+        var lerpPos = Vector2.Lerp(curPos, finalPos, Time.deltaTime * 10);
+        SetContentAnchoredPosition(lerpPos);
+    }
+
+    int FindNearIndex()
+    {
+        var position = m_Content.anchoredPosition.x;
+        var index = (from i in index2contentPosDic
+                     orderby Mathf.Abs(position - i.Value)
+                     select i).FirstOrDefault().Key;
+        return index;
+    }
+
+    protected void UpdatePrevData()
+    {
+        if (m_Content == null)
+            m_PrevPosition = Vector2.zero;
+        else
+            m_PrevPosition = m_Content.anchoredPosition;
+        m_PrevViewBounds = m_ViewBounds;
+        m_PrevContentBounds = m_ContentBounds;
+    }
+
+
+
+    public void OnBeginDrag(PointerEventData eventData)
+    {
+        if (eventData.button != PointerEventData.InputButton.Left)
+            return;
+        if (!IsActive())
+            return;
+        if (!m_isCanDrag)
+            return;
+        UpdateBounds();
+
+        beginDragTime = Time.realtimeSinceStartup;
+        m_PointerStartLocalCursor = Vector2.zero;
+        RectTransformUtility.ScreenPointToLocalPointInRectangle(viewRect, eventData.position, eventData.pressEventCamera, out m_PointerStartLocalCursor);
+        m_ContentStartPosition = m_Content.anchoredPosition;
+        m_Dragging = true;
+        this.m_isAutoMoveContont = false;
+        isMoveEnd = false;
+    }
+
+    public void OnInitializePotentialDrag(PointerEventData eventData)
+    {
+        if (eventData.button != PointerEventData.InputButton.Left)
+            return;
+
+        m_Velocity = Vector2.zero;
+    }
+
+    public void OnDrag(PointerEventData eventData)
+    {
+        if (eventData.button != PointerEventData.InputButton.Left)
+            return;
+        if (!IsActive())
+            return;
+        if (!m_isCanDrag)
+            return;
+        Vector2 localCursor;
+        if (!RectTransformUtility.ScreenPointToLocalPointInRectangle(viewRect, eventData.position, eventData.pressEventCamera, out localCursor))
+            return;
+        UpdateBounds();
+
+        var pointerDelta = localCursor - m_PointerStartLocalCursor;
+        Vector2 position = m_ContentStartPosition + pointerDelta;
+
+        Vector2 offset = CalculateOffset(position - m_Content.anchoredPosition);
+        position += offset;
+
+        if (offset.x != 0)
+            position.x = position.x - RubberDelta(offset.x, m_ViewBounds.size.x);
+        if (offset.y != 0)
+            position.y = position.y - RubberDelta(offset.y, m_ViewBounds.size.y);
+        //Debug.Log("pointerDelta = " + pointerDelta);
+        SetContentAnchoredPosition(position);
+    }
+    public void OnEndDrag(PointerEventData eventData)
+    {
+        //Debug.Log("滑动结束" + eventData.button);
+        endDragTime = Time.realtimeSinceStartup;
+        var deltaDragTime = endDragTime - beginDragTime;
+        //Debug.Log("deltaDragTime" + deltaDragTime);
+        if (eventData.button != PointerEventData.InputButton.Left)
+            return;
+        m_Dragging = false;
+        this.m_isAutoMoveContont = true;
+        //startIndex = FindNearIndex();
+        //Debug.Log("NextIndex = " + startIndex);
+        //StartCoroutine(moveCro(startIndex));
+    }
+
+    private static float RubberDelta(float overStretching, float viewSize)
+    {
+        return (1 - (1 / ((Mathf.Abs(overStretching) * 0.55f / viewSize) + 1))) * viewSize * Mathf.Sign(overStretching);
+    }
+
+    private Vector2 CalculateOffset(Vector2 delta)
+    {
+        return InternalCalculateOffset(ref m_ViewBounds, ref m_ContentBounds, m_Horizontal, m_Vertical, ref delta);
+    }
+
+    internal static Vector2 InternalCalculateOffset(ref Bounds viewBounds, ref Bounds contentBounds, bool horizontal, bool vertical, ref Vector2 delta)
+    {
+        Vector2 offset = Vector2.zero;
+
+        Vector2 min = contentBounds.min;
+        Vector2 max = contentBounds.max;
+
+        if (horizontal)
+        {
+            min.x += delta.x;
+            max.x += delta.x;
+            if (min.x > viewBounds.min.x)
+                offset.x = viewBounds.min.x - min.x;
+            else if (max.x < viewBounds.max.x)
+                offset.x = viewBounds.max.x - max.x;
+        }
+
+        if (vertical)
+        {
+            min.y += delta.y;
+            max.y += delta.y;
+            if (max.y < viewBounds.max.y)
+                offset.y = viewBounds.max.y - max.y;
+            else if (min.y > viewBounds.min.y)
+                offset.y = viewBounds.min.y - min.y;
+        }
+
+        return offset;
+    }
+    protected virtual void SetContentAnchoredPosition(Vector2 position)
+    {
+        if (!m_Horizontal)
+            position.x = m_Content.anchoredPosition.x;
+        if (!m_Vertical)
+            position.y = m_Content.anchoredPosition.y;
+
+        if (position != m_Content.anchoredPosition)
+        {
+            m_Content.anchoredPosition = position;
+        }
+    }
+    protected void UpdateBounds()
+    {
+        m_ViewBounds = new Bounds(viewRect.rect.center, viewRect.rect.size);
+        m_ContentBounds = GetBounds();
+
+    }
+    private readonly Vector3[] m_Corners = new Vector3[4];
+    private Bounds GetBounds()
+    {
+        if (m_Content == null)
+            return new Bounds();
+        m_Content.GetWorldCorners(m_Corners);
+        var viewWorldToLocalMatrix = viewRect.worldToLocalMatrix;
+        return InternalGetBounds(m_Corners, ref viewWorldToLocalMatrix);
+    }
+
+    internal static Bounds InternalGetBounds(Vector3[] corners, ref Matrix4x4 viewWorldToLocalMatrix)
+    {
+        var vMin = new Vector3(float.MaxValue, float.MaxValue, float.MaxValue);
+        var vMax = new Vector3(float.MinValue, float.MinValue, float.MinValue);
+
+        for (int j = 0; j < 4; j++)
+        {
+            Vector3 v = viewWorldToLocalMatrix.MultiplyPoint3x4(corners[j]);
+            vMin = Vector3.Min(v, vMin);
+            vMax = Vector3.Max(v, vMax);
+        }
+
+        var bounds = new Bounds(vMin, Vector3.zero);
+        bounds.Encapsulate(vMax);
+        return bounds;
+    }
+
+    void OnGUI()
+    {
+        if (Application.isPlaying)
+            return;
+        if (!m_Viewport || !content)
+            return;
+        EditContent();
+    }
+}
+
+public partial class BannerWidget : UIBaseWidget
+{
+    int startIndex = 2;
+    public string cellItemName;
+
+    List<object> dataList = new List<object>();
+    Action<GameObject, object, int> onUpdateCellData;
+
+    public override bool AddEventListener(UIEvent eventType, Action<PointerEventData> onEventHandler)
+    {
+        bool sign = true;
+
+        return sign;
+    }
+    public override WidgetType GetWidgetType()
+    {
+        return WidgetType.Banner;
+    }
+
+}

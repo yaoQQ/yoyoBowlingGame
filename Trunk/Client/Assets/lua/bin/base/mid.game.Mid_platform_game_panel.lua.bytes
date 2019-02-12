@@ -1,0 +1,90 @@
+local ImageWidget=CS.ImageWidget
+local BannerWidget=CS.BannerWidget
+local PanelWidget=CS.PanelWidget
+local TextWidget=CS.TextWidget
+local CellGroupWidget=CS.CellGroupWidget
+local ScrollPanelWidget=CS.ScrollPanelWidget
+local IconWidget=CS.IconWidget
+
+Mid_platform_game_panel={}
+local this = Mid_platform_game_panel
+
+function this:new(gameObject)
+	local o = { }
+	setmetatable(o, self)
+	self.__index = self
+	o:init(gameObject)
+	return o
+end
+
+this.go = nil
+this.bg_image=nil
+this.head_banner=nil
+this.hot_game_panel=nil
+this.hot_no_text=nil
+this.hot_bg_image=nil
+this.hot_group=nil
+this.near_competition_panel=nil
+this.near_no_text=nil
+this.near_bg_image=nil
+this.near_scroll_panel=nil
+this.near_group=nil
+this.near_more_image=nil
+this.near_more_text=nil
+--HotGameItem数组
+this.hotGameItemArr={}
+--NearItem数组
+this.nearItemArr={}
+
+function this:init(gameObject)
+	self.go=gameObject
+	self.bg_image=self.go.transform:Find("bg_image"):GetComponent(typeof(ImageWidget))
+	self.head_banner=self.go.transform:Find("head_banner"):GetComponent(typeof(BannerWidget))
+	self.hot_game_panel=self.go.transform:Find("hot_game_panel"):GetComponent(typeof(PanelWidget))
+	self.hot_no_text=self.go.transform:Find("hot_game_panel/hot_no_text"):GetComponent(typeof(TextWidget))
+	self.hot_bg_image=self.go.transform:Find("hot_game_panel/hot_bg_image"):GetComponent(typeof(ImageWidget))
+	self.hot_group=self.go.transform:Find("hot_game_panel/hot_group"):GetComponent(typeof(CellGroupWidget))
+	self.near_competition_panel=self.go.transform:Find("near_competition_panel"):GetComponent(typeof(PanelWidget))
+	self.near_no_text=self.go.transform:Find("near_competition_panel/near_no_text"):GetComponent(typeof(TextWidget))
+	self.near_bg_image=self.go.transform:Find("near_competition_panel/near_bg_image"):GetComponent(typeof(ImageWidget))
+	self.near_scroll_panel=self.go.transform:Find("near_competition_panel/near_scroll_panel"):GetComponent(typeof(ScrollPanelWidget))
+	self.near_group=self.go.transform:Find("near_competition_panel/near_scroll_panel/content/near_group"):GetComponent(typeof(CellGroupWidget))
+	self.near_more_image=self.go.transform:Find("near_competition_panel/near_more_image"):GetComponent(typeof(ImageWidget))
+	self.near_more_text=self.go.transform:Find("near_competition_panel/near_more_image/near_more_text"):GetComponent(typeof(TextWidget))
+	self.hotGameItemArr={}
+	table.insert(self.hotGameItemArr,self.new_HotGameItem(self.go.transform:Find("hot_game_panel/hot_group/CellItem").gameObject))
+	table.insert(self.hotGameItemArr,self.new_HotGameItem(self.go.transform:Find("hot_game_panel/hot_group/CellItem_1").gameObject))
+	self.nearItemArr={}
+	table.insert(self.nearItemArr,self.new_NearItem(self.go.transform:Find("near_competition_panel/near_scroll_panel/content/near_group/CellItem").gameObject))
+	table.insert(self.nearItemArr,self.new_NearItem(self.go.transform:Find("near_competition_panel/near_scroll_panel/content/near_group/CellItem_1").gameObject))
+	table.insert(self.nearItemArr,self.new_NearItem(self.go.transform:Find("near_competition_panel/near_scroll_panel/content/near_group/CellItem_2").gameObject))
+	table.insert(self.nearItemArr,self.new_NearItem(self.go.transform:Find("near_competition_panel/near_scroll_panel/content/near_group/CellItem_3").gameObject))
+	table.insert(self.nearItemArr,self.new_NearItem(self.go.transform:Find("near_competition_panel/near_scroll_panel/content/near_group/CellItem_4").gameObject))
+	table.insert(self.nearItemArr,self.new_NearItem(self.go.transform:Find("near_competition_panel/near_scroll_panel/content/near_group/CellItem_5").gameObject))
+end
+
+--HotGameItem复用单元
+function this.new_HotGameItem(itemGo)
+	local item = { }
+	item.go = itemGo
+	item.bg_icon=itemGo.transform:Find("bg_icon"):GetComponent(typeof(IconWidget))
+	item.game_image=itemGo.transform:Find("game_bg_image/game_image"):GetComponent(typeof(ImageWidget))
+	item.game_name_text=itemGo.transform:Find("game_name_text"):GetComponent(typeof(TextWidget))
+	item.game_introduce_text=itemGo.transform:Find("game_introduce_text"):GetComponent(typeof(TextWidget))
+	return item
+end
+--NearItem复用单元
+function this.new_NearItem(itemGo)
+	local item = { }
+	item.go = itemGo
+	item.bg_icon=itemGo.transform:Find("bg_icon"):GetComponent(typeof(IconWidget))
+	item.game_image=itemGo.transform:Find("game_bg_image/game_image"):GetComponent(typeof(ImageWidget))
+	item.reward_image=itemGo.transform:Find("game_bg_image/reward_image"):GetComponent(typeof(ImageWidget))
+	item.game_name_text=itemGo.transform:Find("game_name_text"):GetComponent(typeof(TextWidget))
+	item.activity_name_text=itemGo.transform:Find("activity_name_text"):GetComponent(typeof(TextWidget))
+	item.sponsor_name_text=itemGo.transform:Find("sponsor_name_text"):GetComponent(typeof(TextWidget))
+	item.activity_state_icon=itemGo.transform:Find("activity_state_icon"):GetComponent(typeof(IconWidget))
+	item.game_state_text=itemGo.transform:Find("activity_state_icon/game_state_text"):GetComponent(typeof(TextWidget))
+	return item
+end
+

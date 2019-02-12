@@ -1,0 +1,62 @@
+local ImageWidget=CS.ImageWidget
+local CircleImageWidget=CS.CircleImageWidget
+local EmptyImageWidget=CS.EmptyImageWidget
+local EffectWidget=CS.EffectWidget
+local TextWidget=CS.TextWidget
+
+Mid_common_top_cost_panel={}
+local this = Mid_common_top_cost_panel
+
+function this:new(gameObject)
+	local o = { }
+	setmetatable(o, self)
+	self.__index = self
+	o:init(gameObject)
+	return o
+end
+
+this.go = nil
+this.head_Image=nil
+this.head_Icon=nil
+this.press_Image=nil
+this.top_gold=nil
+this.goldEffect=nil
+this.top_gold_Text=nil
+this.top_gold_Button=nil
+this.top_diamond=nil
+this.diamondEffect=nil
+this.top_diamond_Text=nil
+this.top_diamond_Button=nil
+this.top_yo_card=nil
+this.ucardEffect=nil
+this.top_yo_card_Text=nil
+this.top_yo_card_Button=nil
+this.top_packet=nil
+this.packetEffect=nil
+this.top_packet_Text=nil
+this.top_packet_Button=nil
+
+function this:init(gameObject)
+	self.go=gameObject
+	self.head_Image=self.go.transform:Find("head_Image"):GetComponent(typeof(ImageWidget))
+	self.head_Icon=self.go.transform:Find("head_Image/head_Icon"):GetComponent(typeof(CircleImageWidget))
+	self.press_Image=self.go.transform:Find("head_Image/press_Image"):GetComponent(typeof(EmptyImageWidget))
+	self.top_gold=self.go.transform:Find("top_gold"):GetComponent(typeof(ImageWidget))
+	self.goldEffect=self.go.transform:Find("top_gold/Image/top_gold_Image/goldEffect"):GetComponent(typeof(EffectWidget))
+	self.top_gold_Text=self.go.transform:Find("top_gold/Image/top_gold_Text"):GetComponent(typeof(TextWidget))
+	self.top_gold_Button=self.go.transform:Find("top_gold/top_gold_Button"):GetComponent(typeof(EmptyImageWidget))
+	self.top_diamond=self.go.transform:Find("top_diamond"):GetComponent(typeof(ImageWidget))
+	self.diamondEffect=self.go.transform:Find("top_diamond/Image/top_diamond_Image/diamondEffect"):GetComponent(typeof(EffectWidget))
+	self.top_diamond_Text=self.go.transform:Find("top_diamond/Image/top_diamond_Text"):GetComponent(typeof(TextWidget))
+	self.top_diamond_Button=self.go.transform:Find("top_diamond/top_diamond_Button"):GetComponent(typeof(EmptyImageWidget))
+	self.top_yo_card=self.go.transform:Find("top_yo_card"):GetComponent(typeof(ImageWidget))
+	self.ucardEffect=self.go.transform:Find("top_yo_card/Image/top_yo_card_Image/ucardEffect"):GetComponent(typeof(EffectWidget))
+	self.top_yo_card_Text=self.go.transform:Find("top_yo_card/Image/top_yo_card_Text"):GetComponent(typeof(TextWidget))
+	self.top_yo_card_Button=self.go.transform:Find("top_yo_card/top_yo_card_Button"):GetComponent(typeof(EmptyImageWidget))
+	self.top_packet=self.go.transform:Find("top_packet"):GetComponent(typeof(ImageWidget))
+	self.packetEffect=self.go.transform:Find("top_packet/Image/top_yo_card_Image/packetEffect"):GetComponent(typeof(EffectWidget))
+	self.top_packet_Text=self.go.transform:Find("top_packet/Image/top_packet_Text"):GetComponent(typeof(TextWidget))
+	self.top_packet_Button=self.go.transform:Find("top_packet/top_packet_Button"):GetComponent(typeof(EmptyImageWidget))
+end
+
+

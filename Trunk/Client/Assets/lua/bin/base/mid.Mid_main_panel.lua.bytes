@@ -1,0 +1,71 @@
+local ButtonWidget=CS.ButtonWidget
+local CellRecycleScrollWidget=CS.CellRecycleScrollWidget
+local TextWidget=CS.TextWidget
+local ImageWidget=CS.ImageWidget
+
+Mid_main_panel={}
+local this = Mid_main_panel
+
+function this:new(gameObject)
+	local o = { }
+	setmetatable(o, self)
+	self.__index = self
+	o:init(gameObject)
+	return o
+end
+
+this.go = nil
+this.btn_scan=nil
+this.chat_CellRecycleScrollPanel=nil
+this.chat_msg_Text=nil
+this.btn_main_menu=nil
+this.btn_mall=nil
+this.btn_business=nil
+this.btn_friend=nil
+this.newFriendCount_Image=nil
+this.newFriendCount_Text=nil
+this.btn_chat=nil
+this.offlineMsgCount_Image=nil
+this.offlineMsgCount_Text=nil
+this.btn_add=nil
+this.btn_sub=nil
+this.btn_mypos=nil
+this.btn_redBag=nil
+this.btn_my_red=nil
+--MsgItem数组
+this.msgItemArr={}
+
+function this:init(gameObject)
+	self.go=gameObject
+	self.btn_scan=self.go.transform:Find("top_left/btn_scan"):GetComponent(typeof(ButtonWidget))
+	self.chat_CellRecycleScrollPanel=self.go.transform:Find("top_left/chat_CellRecycleScrollPanel"):GetComponent(typeof(CellRecycleScrollWidget))
+	self.chat_msg_Text=self.go.transform:Find("top_left/chat_Panel/chat_msg_Text"):GetComponent(typeof(TextWidget))
+	self.btn_main_menu=self.go.transform:Find("buttom_left/btn_main_menu"):GetComponent(typeof(ButtonWidget))
+	self.btn_mall=self.go.transform:Find("buttom_left/btn_mall"):GetComponent(typeof(ButtonWidget))
+	self.btn_business=self.go.transform:Find("buttom_left/btn_business"):GetComponent(typeof(ButtonWidget))
+	self.btn_friend=self.go.transform:Find("buttom_left/btn_friend"):GetComponent(typeof(ButtonWidget))
+	self.newFriendCount_Image=self.go.transform:Find("buttom_left/btn_friend/newFriendCount_Image"):GetComponent(typeof(ImageWidget))
+	self.newFriendCount_Text=self.go.transform:Find("buttom_left/btn_friend/newFriendCount_Image/newFriendCount_Text"):GetComponent(typeof(TextWidget))
+	self.btn_chat=self.go.transform:Find("buttom_left/btn_chat"):GetComponent(typeof(ButtonWidget))
+	self.offlineMsgCount_Image=self.go.transform:Find("buttom_left/btn_chat/offlineMsgCount_Image"):GetComponent(typeof(ImageWidget))
+	self.offlineMsgCount_Text=self.go.transform:Find("buttom_left/btn_chat/offlineMsgCount_Image/offlineMsgCount_Text"):GetComponent(typeof(TextWidget))
+	self.btn_add=self.go.transform:Find("buttom_right/btn_add"):GetComponent(typeof(ButtonWidget))
+	self.btn_sub=self.go.transform:Find("buttom_right/btn_sub"):GetComponent(typeof(ButtonWidget))
+	self.btn_mypos=self.go.transform:Find("buttom_right/btn_mypos"):GetComponent(typeof(ButtonWidget))
+	self.btn_redBag=self.go.transform:Find("buttom_right/btn_redBag"):GetComponent(typeof(ButtonWidget))
+	self.btn_my_red=self.go.transform:Find("buttom/btn_my_red"):GetComponent(typeof(ButtonWidget))
+	self.msgItemArr={}
+	table.insert(self.msgItemArr,self.new_MsgItem(self.go.transform:Find("top_left/chat_CellRecycleScrollPanel/content/msgitem").gameObject))
+	table.insert(self.msgItemArr,self.new_MsgItem(self.go.transform:Find("top_left/chat_CellRecycleScrollPanel/content/msgitem_1").gameObject))
+	table.insert(self.msgItemArr,self.new_MsgItem(self.go.transform:Find("top_left/chat_CellRecycleScrollPanel/content/msgitem_2").gameObject))
+	table.insert(self.msgItemArr,self.new_MsgItem(self.go.transform:Find("top_left/chat_CellRecycleScrollPanel/content/msgitem_3").gameObject))
+end
+
+--MsgItem复用单元
+function this.new_MsgItem(itemGo)
+	local item = { }
+	item.go = itemGo
+	item.msg_text=itemGo.transform:Find("msg_text"):GetComponent(typeof(TextWidget))
+	return item
+end
+

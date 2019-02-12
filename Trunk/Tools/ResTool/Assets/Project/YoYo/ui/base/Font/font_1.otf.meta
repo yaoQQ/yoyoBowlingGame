@@ -1,0 +1,21 @@
+fileFormatVersion: 2
+guid: e1a48243603016842965010e58ff9e15
+timeCreated: 1483686373
+licenseType: Pro
+TrueTypeFontImporter:
+  serializedVersion: 4
+  fontSize: 16
+  forceTextureCase: -2
+  characterSpacing: 0
+  characterPadding: 1
+  includeFontData: 1
+  fontName: Source Han Sans CN
+  fontNames:
+  - Source Han Sans CN
+  fallbackFontReferences: []
+  customCharacters: 
+  fontRenderingMode: 0
+  ascentCalculationMode: 1
+  userData: 
+  assetBundleName: font/font_1.unity3d
+  assetBundleVariant: 

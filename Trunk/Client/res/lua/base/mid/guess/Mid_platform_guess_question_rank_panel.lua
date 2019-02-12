@@ -1,0 +1,85 @@
+﻿local EmptyImageWidget=CS.EmptyImageWidget
+local TextWidget=CS.TextWidget
+local IconWidget=CS.IconWidget
+local ImageWidget=CS.ImageWidget
+local PanelWidget=CS.PanelWidget
+local CellRecycleScrollWidget=CS.CellRecycleScrollWidget
+local CircleImageWidget=CS.CircleImageWidget
+
+Mid_platform_guess_question_rank_panel={}
+local this = Mid_platform_guess_question_rank_panel
+
+function this:new(gameObject)
+	local o = { }
+	setmetatable(o, self)
+	self.__index = self
+	o:init(gameObject)
+	return o
+end
+
+this.go = nil
+this.btn_return=nil
+this.question_title_Text=nil
+this.btn_answer_1=nil
+this.answer_1_Text=nil
+this.answer_1_right=nil
+this.btn_answer_2=nil
+this.answer_2_Text=nil
+this.answer_2_right=nil
+this.btn_answer_3=nil
+this.answer_3_Text=nil
+this.answer_3_right=nil
+this.btn_answer_4=nil
+this.answer_4_Text=nil
+this.answer_4_right=nil
+this.Mid_Panel=nil
+this.rank_scroll_list=nil
+--Rank_Cell数组
+this.rank_CellArr={}
+
+function this:init(gameObject)
+	self.go=gameObject
+	self.btn_return=self.go.transform:Find("btn_return/btn_return"):GetComponent(typeof(EmptyImageWidget))
+	self.question_title_Text=self.go.transform:Find("Top_Panel/question/question_title_Text"):GetComponent(typeof(TextWidget))
+	self.btn_answer_1=self.go.transform:Find("Top_Panel/question/btn_answer_1"):GetComponent(typeof(IconWidget))
+	self.answer_1_Text=self.go.transform:Find("Top_Panel/question/btn_answer_1/answer_1_Text"):GetComponent(typeof(TextWidget))
+	self.answer_1_right=self.go.transform:Find("Top_Panel/question/btn_answer_1/answer_1_right"):GetComponent(typeof(ImageWidget))
+	self.btn_answer_2=self.go.transform:Find("Top_Panel/question/btn_answer_2"):GetComponent(typeof(IconWidget))
+	self.answer_2_Text=self.go.transform:Find("Top_Panel/question/btn_answer_2/answer_2_Text"):GetComponent(typeof(TextWidget))
+	self.answer_2_right=self.go.transform:Find("Top_Panel/question/btn_answer_2/answer_2_right"):GetComponent(typeof(ImageWidget))
+	self.btn_answer_3=self.go.transform:Find("Top_Panel/question/btn_answer_3"):GetComponent(typeof(IconWidget))
+	self.answer_3_Text=self.go.transform:Find("Top_Panel/question/btn_answer_3/answer_3_Text"):GetComponent(typeof(TextWidget))
+	self.answer_3_right=self.go.transform:Find("Top_Panel/question/btn_answer_3/answer_3_right"):GetComponent(typeof(ImageWidget))
+	self.btn_answer_4=self.go.transform:Find("Top_Panel/question/btn_answer_4"):GetComponent(typeof(IconWidget))
+	self.answer_4_Text=self.go.transform:Find("Top_Panel/question/btn_answer_4/answer_4_Text"):GetComponent(typeof(TextWidget))
+	self.answer_4_right=self.go.transform:Find("Top_Panel/question/btn_answer_4/answer_4_right"):GetComponent(typeof(ImageWidget))
+	self.Mid_Panel=self.go.transform:Find("Mid_Panel"):GetComponent(typeof(PanelWidget))
+	self.rank_scroll_list=self.go.transform:Find("Mid_Panel/rank_scroll_list"):GetComponent(typeof(CellRecycleScrollWidget))
+	self.rank_CellArr={}
+	table.insert(self.rank_CellArr,self.new_Rank_Cell(self.go.transform:Find("Mid_Panel/rank_scroll_list/content/cellitem").gameObject))
+	table.insert(self.rank_CellArr,self.new_Rank_Cell(self.go.transform:Find("Mid_Panel/rank_scroll_list/content/cellitem_1").gameObject))
+	table.insert(self.rank_CellArr,self.new_Rank_Cell(self.go.transform:Find("Mid_Panel/rank_scroll_list/content/cellitem_2").gameObject))
+	table.insert(self.rank_CellArr,self.new_Rank_Cell(self.go.transform:Find("Mid_Panel/rank_scroll_list/content/cellitem_3").gameObject))
+	table.insert(self.rank_CellArr,self.new_Rank_Cell(self.go.transform:Find("Mid_Panel/rank_scroll_list/content/cellitem_4").gameObject))
+	table.insert(self.rank_CellArr,self.new_Rank_Cell(self.go.transform:Find("Mid_Panel/rank_scroll_list/content/cellitem_5").gameObject))
+	table.insert(self.rank_CellArr,self.new_Rank_Cell(self.go.transform:Find("Mid_Panel/rank_scroll_list/content/cellitem_6").gameObject))
+	table.insert(self.rank_CellArr,self.new_Rank_Cell(self.go.transform:Find("Mid_Panel/rank_scroll_list/content/cellitem_7").gameObject))
+	table.insert(self.rank_CellArr,self.new_Rank_Cell(self.go.transform:Find("Mid_Panel/rank_scroll_list/content/cellitem_8").gameObject))
+	table.insert(self.rank_CellArr,self.new_Rank_Cell(self.go.transform:Find("Mid_Panel/rank_scroll_list/content/cellitem_9").gameObject))
+	table.insert(self.rank_CellArr,self.new_Rank_Cell(self.go.transform:Find("Mid_Panel/rank_scroll_list/content/cellitem_10").gameObject))
+	table.insert(self.rank_CellArr,self.new_Rank_Cell(self.go.transform:Find("Mid_Panel/rank_scroll_list/content/cellitem_11").gameObject))
+end
+
+--Rank_Cell复用单元
+function this.new_Rank_Cell(itemGo)
+	local item = { }
+	item.go = itemGo
+	item.highLight_Image=itemGo.transform:Find("highLight_Image"):GetComponent(typeof(ImageWidget))
+	item.rank_Icon=itemGo.transform:Find("rank_Icon"):GetComponent(typeof(IconWidget))
+	item.rank_Text=itemGo.transform:Find("rank_Text"):GetComponent(typeof(TextWidget))
+	item.head_CircleImage=itemGo.transform:Find("head_CircleImage"):GetComponent(typeof(CircleImageWidget))
+	item.player_name_Text=itemGo.transform:Find("player_name_Text"):GetComponent(typeof(TextWidget))
+	item.use_Time_Text=itemGo.transform:Find("use_Time_Text"):GetComponent(typeof(TextWidget))
+	return item
+end
+

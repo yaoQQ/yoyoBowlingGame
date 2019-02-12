@@ -1,0 +1,81 @@
+﻿local EmptyImageWidget=CS.EmptyImageWidget
+local TextWidget=CS.TextWidget
+local ImageWidget=CS.ImageWidget
+local CellRecycleScrollWidget=CS.CellRecycleScrollWidget
+local IconWidget=CS.IconWidget
+local CircleImageWidget=CS.CircleImageWidget
+
+Mid_platform_coupon_main_panel={}
+local this = Mid_platform_coupon_main_panel
+
+function this:new(gameObject)
+	local o = { }
+	setmetatable(o, self)
+	self.__index = self
+	o:init(gameObject)
+	return o
+end
+
+this.go = nil
+this.back_Image=nil
+this.used_Text=nil
+this.expired_Text=nil
+this.available_Text=nil
+this.used_Image=nil
+this.expired_Image=nil
+this.avail_Image=nil
+this.coupon_CellRecycleScrollPanel=nil
+this.sortTypeChoose=nil
+this.sort_text=nil
+this.sort_image=nil
+this.sortDetailPanel=nil
+this.newSort_text=nil
+this.expriedSort_text=nil
+this.chooseIcon=nil
+--CouponCell数组
+this.couponCellArr={}
+
+function this:init(gameObject)
+	self.go=gameObject
+	self.back_Image=self.go.transform:Find("back_Image/back_Image"):GetComponent(typeof(EmptyImageWidget))
+	self.used_Text=self.go.transform:Find("used_Text"):GetComponent(typeof(TextWidget))
+	self.expired_Text=self.go.transform:Find("expired_Text"):GetComponent(typeof(TextWidget))
+	self.available_Text=self.go.transform:Find("available_Text"):GetComponent(typeof(TextWidget))
+	self.used_Image=self.go.transform:Find("used_Image"):GetComponent(typeof(ImageWidget))
+	self.expired_Image=self.go.transform:Find("expired_Image"):GetComponent(typeof(ImageWidget))
+	self.avail_Image=self.go.transform:Find("avail_Image"):GetComponent(typeof(ImageWidget))
+	self.coupon_CellRecycleScrollPanel=self.go.transform:Find("coupon_CellRecycleScrollPanel"):GetComponent(typeof(CellRecycleScrollWidget))
+	self.sortTypeChoose=self.go.transform:Find("sortTypeChoose"):GetComponent(typeof(ImageWidget))
+	self.sort_text=self.go.transform:Find("sortTypeChoose/sort_text"):GetComponent(typeof(TextWidget))
+	self.sort_image=self.go.transform:Find("sortTypeChoose/sort_image"):GetComponent(typeof(IconWidget))
+	self.sortDetailPanel=self.go.transform:Find("sortTypeChoose/sortDetailPanel"):GetComponent(typeof(ImageWidget))
+	self.newSort_text=self.go.transform:Find("sortTypeChoose/sortDetailPanel/newSort_text"):GetComponent(typeof(TextWidget))
+	self.expriedSort_text=self.go.transform:Find("sortTypeChoose/sortDetailPanel/expriedSort_text"):GetComponent(typeof(TextWidget))
+	self.chooseIcon=self.go.transform:Find("sortTypeChoose/sortDetailPanel/chooseIcon"):GetComponent(typeof(ImageWidget))
+	self.couponCellArr={}
+	table.insert(self.couponCellArr,self.new_CouponCell(self.go.transform:Find("coupon_CellRecycleScrollPanel/content/cellitem").gameObject))
+	table.insert(self.couponCellArr,self.new_CouponCell(self.go.transform:Find("coupon_CellRecycleScrollPanel/content/cellitem_1").gameObject))
+	table.insert(self.couponCellArr,self.new_CouponCell(self.go.transform:Find("coupon_CellRecycleScrollPanel/content/cellitem_2").gameObject))
+	table.insert(self.couponCellArr,self.new_CouponCell(self.go.transform:Find("coupon_CellRecycleScrollPanel/content/cellitem_3").gameObject))
+	table.insert(self.couponCellArr,self.new_CouponCell(self.go.transform:Find("coupon_CellRecycleScrollPanel/content/cellitem_4").gameObject))
+	table.insert(self.couponCellArr,self.new_CouponCell(self.go.transform:Find("coupon_CellRecycleScrollPanel/content/cellitem_5").gameObject))
+	table.insert(self.couponCellArr,self.new_CouponCell(self.go.transform:Find("coupon_CellRecycleScrollPanel/content/cellitem_6").gameObject))
+	table.insert(self.couponCellArr,self.new_CouponCell(self.go.transform:Find("coupon_CellRecycleScrollPanel/content/cellitem_7").gameObject))
+	table.insert(self.couponCellArr,self.new_CouponCell(self.go.transform:Find("coupon_CellRecycleScrollPanel/content/cellitem_8").gameObject))
+end
+
+--CouponCell复用单元
+function this.new_CouponCell(itemGo)
+	local item = { }
+	item.go = itemGo
+	item.coupon_diy_image=itemGo.transform:Find("coupon_diy_image"):GetComponent(typeof(ImageWidget))
+	item.coupon_bg_icon=itemGo.transform:Find("coupon_bg_icon"):GetComponent(typeof(IconWidget))
+	item.coupon_cant_use_image=itemGo.transform:Find("coupon_bg_icon/coupon_cant_use_image"):GetComponent(typeof(ImageWidget))
+	item.coupon_image=itemGo.transform:Find("coupon_bg_icon/coupon_image"):GetComponent(typeof(CircleImageWidget))
+	item.shop_name_text=itemGo.transform:Find("coupon_bg_icon/shop_name_text"):GetComponent(typeof(TextWidget))
+	item.coupon_name_text=itemGo.transform:Find("coupon_bg_icon/coupon_name_text"):GetComponent(typeof(TextWidget))
+	item.expired_label_Icon=itemGo.transform:Find("expired_label_Icon"):GetComponent(typeof(IconWidget))
+	item.new_label_Image=itemGo.transform:Find("new_label_Image"):GetComponent(typeof(ImageWidget))
+	return item
+end
+

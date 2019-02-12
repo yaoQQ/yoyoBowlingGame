@@ -1,0 +1,19 @@
+TableBaseSigninmonth = {data = {}}
+
+TableBaseSigninmonth.m_isInit = false
+
+function TableBaseSigninmonth.init()
+	if TableBaseSigninmonth.m_isInit then
+		return
+	else
+		TableBaseSigninmonth.data[1] = { id = 1, Day = 9, money = 10, money1 = 40, power1 = 100, diamond = 0, diamond1 = 0, power2 = 0, gold = 0, gold1 = 0, power3 = 0}
+		TableBaseSigninmonth.data[2] = { id = 2, Day = 18, money = 15, money1 = 65, power1 = 100, diamond = 0, diamond1 = 0, power2 = 0, gold = 0, gold1 = 0, power3 = 0}
+		TableBaseSigninmonth.data[3] = { id = 3, Day = 27, money = 25, money1 = 100, power1 = 100, diamond = 0, diamond1 = 0, power2 = 0, gold = 0, gold1 = 0, power3 = 0}
+		TableBaseSigninmonth.m_isInit = true
+	end
+end
+
+function TableBaseSigninmonth.clear()
+	TableBaseSigninmonth.m_isInit = false
+	TableBaseSigninmonth.data = {}
+end

@@ -1,0 +1,35 @@
+local PanelWidget=CS.PanelWidget
+local ImageWidget=CS.ImageWidget
+local InputFieldWidget=CS.InputFieldWidget
+local ButtonWidget=CS.ButtonWidget
+
+Mid_platform_common_search_panel={}
+local this = Mid_platform_common_search_panel
+
+function this:new(gameObject)
+	local o = { }
+	setmetatable(o, self)
+	self.__index = self
+	o:init(gameObject)
+	return o
+end
+
+this.go = nil
+this.platform_common_search_panel=nil
+this.mask_Image=nil
+this.search_InputField=nil
+this.clear_Image=nil
+this.confirm_Button=nil
+this.cancel_Button=nil
+
+function this:init(gameObject)
+	self.go=gameObject
+	self.platform_common_search_panel=self.go.transform:Find(""):GetComponent(typeof(PanelWidget))
+	self.mask_Image=self.go.transform:Find("mask_Image"):GetComponent(typeof(ImageWidget))
+	self.search_InputField=self.go.transform:Find("Image/search_InputField"):GetComponent(typeof(InputFieldWidget))
+	self.clear_Image=self.go.transform:Find("Image/Image/clear_Image"):GetComponent(typeof(ImageWidget))
+	self.confirm_Button=self.go.transform:Find("Image/confirm_Button"):GetComponent(typeof(ButtonWidget))
+	self.cancel_Button=self.go.transform:Find("Image/cancel_Button"):GetComponent(typeof(ButtonWidget))
+end
+
+

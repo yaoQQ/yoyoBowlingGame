@@ -1,0 +1,30 @@
+﻿using System;
+using UnityEngine.EventSystems;
+#if !TOOL
+using XLua;
+
+[LuaCallCSharp]
+#endif
+public class CellItemWidget : UIBaseWidget
+{
+    public int index;
+    public override bool AddEventListener(UIEvent eventType, Action<PointerEventData> onEventHandler)
+    {
+        bool sign = true;
+        switch (eventType)
+        {
+            case UIEvent.PointerClick:
+                PointerClickListener.Get(gameObject).onHandler = onEventHandler;
+                break;
+            default:
+                sign = false;
+                break;
+        }
+        return sign;
+    }
+
+    public override WidgetType GetWidgetType()
+    {
+        return WidgetType.CellItem;
+    }
+}

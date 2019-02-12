@@ -1,0 +1,160 @@
+﻿using UnityEngine;
+using System;
+using UnityEngine.UI;
+using UnityEngine.EventSystems;
+#if !TOOL
+using XLua;
+
+[LuaCallCSharp]
+#endif
+public class PanelWidget : UIBaseWidget
+{
+    public override WidgetType GetWidgetType()
+    {
+        return WidgetType.Panel;
+    }
+
+    public Image Img;
+    public CanvasGroup PanelCanvasGroup;
+    public int sortingOrderOffset = 0;
+    public int UIViewEnum;
+
+    public override bool AddEventListener(UIEvent eventType, Action<PointerEventData> onEventHandler)
+    {
+        bool sign = true;
+        switch (eventType)
+        {
+            case UIEvent.PointerClick:
+                PointerClickListener.Get(gameObject).onHandler = onEventHandler;
+                break;
+            case UIEvent.DragBegin:
+                DragEventHandler.Get(gameObject).onBeginDragHandler = onEventHandler;
+                break;
+            case UIEvent.Drag:
+                DragEventHandler.Get(gameObject).onDragHandler = onEventHandler;
+                break;
+            case UIEvent.DragEnd:
+                DragEventHandler.Get(gameObject).onEndDragHandler = onEventHandler;
+                break;
+            case UIEvent.PointerDown:
+                PointerDownListener.Get(gameObject).onHandler = onEventHandler;
+                break;
+            default:
+                sign = false;
+                break;
+        }
+        return sign;
+    }
+
+    public void SetFarAway(bool isFar)
+    {
+        BaseSetFarAway(isFar);
+    }
+
+    public bool IsFarAway
+    {
+        get { return IsBaeFarAway; }
+    }
+
+
+    public override bool RemoveEventListener(UIEvent eventType, System.Action<PointerEventData> onEventHandler)
+    {
+        bool sign = true;
+        switch (eventType)
+        {
+            case UIEvent.PointerClick:
+                PointerClickListener.Get(gameObject).onHandler = null;
+                break;
+            case UIEvent.DragBegin:
+                DragEventHandler.Get(gameObject).onBeginDragHandler = null;
+                break;
+            case UIEvent.Drag:
+                DragEventHandler.Get(gameObject).onDragHandler = null;
+                break;
+            case UIEvent.DragEnd:
+                DragEventHandler.Get(gameObject).onEndDragHandler = null;
+                break;
+            case UIEvent.PointerDown:
+                PointerDownListener.Get(gameObject).onHandler = null;
+                break;
+            default:
+                sign = false;
+                break;
+        }
+        return sign;
+    }
+
+    private bool m_isInitSort = false;
+    void Update()
+    {
+        if (!m_isInitSort)
+            setSortingOrderOffset(sortingOrderOffset);
+    }
+
+    public void SetPanelCanvasGroupAlpha(float alphaValue)
+    {
+        if (PanelCanvasGroup != null)
+        {
+            PanelCanvasGroup.alpha = alphaValue;
+        }
+    }
+
+
+    static Material mat;
+    public void SetBlurSnap()
+    {
+        //if(mat==null)
+        //{
+        //    mat = Resources.Load<Material>("UIBlurGB");
+        //}
+        //Img.material = mat;
+        //Texture2D texture = UIManager.Instance.GetSnapshot();
+        ////texture = TextureUtil.FastBlur(texture, 2, 5);
+        //Img.sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f));
+        //Img.enabled = true;
+    }
+    public void ClearBlurSnap()
+    {
+
+        //if (Img.sprite != null)
+        //{
+        //    Sprite.Destroy(Img.sprite);
+        //    Img.sprite = null;
+        //}
+        //Img.enabled = false;
+    }
+
+    /// <summary>
+    /// 设置渲染顺序偏移
+    /// </summary>
+    /// <param name="offset"></param>
+    private void setSortingOrderOffset(int offset)
+    {
+        if (offset == 0)
+        {
+            m_isInitSort = true;
+            return;
+        }
+
+        Canvas rootCanvas = null;
+        Transform tr = gameObject.transform;
+        while (rootCanvas == null && tr.parent != null)
+        {
+            tr = tr.parent;
+            rootCanvas = tr.GetComponent<Canvas>();
+        }
+        if (rootCanvas == null)
+            return;
+
+        Canvas canvas = gameObject.GetComponent<Canvas>();
+        if (canvas == null)
+        {
+            canvas = gameObject.AddComponent<Canvas>();
+            gameObject.AddComponent<GraphicRaycaster>();
+        }
+        canvas.overrideSorting = true;
+        canvas.sortingOrder = rootCanvas.sortingOrder + offset;
+
+        m_isInitSort = true;
+    }
+}

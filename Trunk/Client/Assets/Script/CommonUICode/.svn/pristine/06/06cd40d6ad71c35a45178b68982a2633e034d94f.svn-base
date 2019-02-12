@@ -1,0 +1,80 @@
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.EventSystems;
+#if !TOOL
+using XLua;
+[LuaCallCSharp]
+#endif
+
+[RequireComponent(typeof(Animation))]
+[DisallowMultipleComponent]
+public partial class AnimationWidget
+{
+    public Animation BaseAnimation;
+
+
+    public void Play()
+    {
+
+        if (BaseAnimation != null)
+        {
+            BaseAnimation.Play();
+        }
+    }
+    public void Play(string animationName)
+    {
+        if (BaseAnimation != null)
+        {
+            BaseAnimation.Play(animationName);
+        }
+    }
+
+    public void Stop()
+    {
+        if (BaseAnimation != null)
+        {
+            BaseAnimation.Stop();
+        }
+    }
+    public void Stop(string animationName)
+    {
+        if (BaseAnimation != null) BaseAnimation.Stop(animationName);
+    }
+}
+
+public partial class AnimationWidget : UIBaseWidget
+{
+
+    public bool AddExEventListener(UIEvent eventType, Action<PointerEventData> onEventHandler)
+    {
+        bool sign = true;
+
+        return sign;
+    }
+
+    public bool RemoveExEventListener(UIEvent eventType, Action<GameObject> onEventHandler)
+    {
+        bool sign = true;
+
+        return sign;
+    }
+
+    public override bool AddEventListener(UIEvent eventType, Action<PointerEventData> onEventHandler)
+    {
+        bool sign = true;
+        return sign;
+    }
+    public override bool RemoveEventListener(UIEvent eventType, Action<PointerEventData> onEventHandler)
+    {
+        bool sign = true;
+
+        return sign;
+    }
+    public override WidgetType GetWidgetType()
+    {
+        return WidgetType.Animation;
+    }
+
+}

@@ -1,0 +1,279 @@
+﻿using UnityEngine;
+using System.Collections.Generic;
+using System;
+#if !TOOL
+using XLua;
+
+[LuaCallCSharp]
+#endif
+public class CellRecycleNewScrollWidget : ScrollPanelWidget
+{
+    public override WidgetType GetWidgetType()
+    {
+        return WidgetType.CellRecycleNewScroll;
+    }
+
+    [SerializeField]
+    private CellItemWidget m_cellBase;
+    private LinkedList<CellItemWidget> m_cells = new LinkedList<CellItemWidget>();
+
+    //m_visibleRect范围内的cell才显示
+    private Rect m_visibleRect;
+    [SerializeField]
+    private RectOffset m_visibleRectPadding;
+
+    [SerializeField]
+    private RectOffset m_padding;
+    [SerializeField]
+    private float m_spacingHeight = 4f;
+
+    private List<object> m_dataList = new List<object>();
+    private Action<GameObject, object, int> m_onUpdateCellData;
+
+    private float m_contentPos = 0f;
+
+    public void SetCellBase(GameObject cellBaseGO, GameObject contentGO)
+    {
+        m_cellBase = cellBaseGO.GetComponent<CellItemWidget>();
+        UITools.SetParentAndAlign(cellBaseGO, contentGO);
+    }
+    
+    private void UpdateVisibleRect()
+    {
+        m_visibleRect.x = scrollRect.content.anchoredPosition.x - m_visibleRectPadding.left;
+        m_visibleRect.y = -scrollRect.content.anchoredPosition.y + m_visibleRectPadding.top;
+        m_visibleRect.width = scrollRT.rect.width + m_visibleRectPadding.left + m_visibleRectPadding.right;
+        m_visibleRect.height = scrollRT.rect.height + m_visibleRectPadding.top + m_visibleRectPadding.bottom;
+    }
+
+    private Vector2 prevScrollPos;
+
+    protected override void OnValueChanged(Vector2 v2)
+    {
+        base.OnValueChanged(v2);
+
+        //更新m_visibleRect
+        UpdateVisibleRect();
+
+        ReuseCells((v2.y < prevScrollPos.y) ? 1 : -1);
+
+        prevScrollPos = v2;
+    }
+
+    private void ReuseCells (int scrollDirection)
+    {
+        if (m_cells.Count < 1)
+            return;
+
+        if (scrollDirection > 0)
+        {
+            CellItemWidget firstCell = m_cells.First.Value;
+            //Logger.PrintWarning("cell_" + firstCell.index + "_Top:" + firstCell.Top);
+            //Logger.PrintWarning("cell_" + firstCell.index + "_Bottom:" + firstCell.Bottom);
+            //Logger.PrintWarning("m_visibleRect.y:" + m_visibleRect.y);
+            //Logger.PrintWarning("m_visibleRect.height:" + m_visibleRect.height);
+            while (firstCell.Bottom.y > m_visibleRect.y)
+            {
+                CellItemWidget lastCell = m_cells.Last.Value;
+                UpdateCellForIndex(firstCell, lastCell.index + 1);
+                firstCell.Top = lastCell.Bottom + new Vector2(0f, -m_spacingHeight);
+                m_cells.AddLast(firstCell);
+                m_cells.RemoveFirst();
+                firstCell = m_cells.First.Value;
+            }
+
+            FillVisibleRectWithCells();
+        }
+        else if (scrollDirection < 0)
+        {
+            CellItemWidget lastCell = m_cells.Last.Value;
+            while (lastCell.Top.y < m_visibleRect.y - m_visibleRect.height)
+            {
+                CellItemWidget firstCell = m_cells.First.Value;
+                UpdateCellForIndex(lastCell, firstCell.index - 1);
+                lastCell.Bottom = firstCell.Top + new Vector2(0f, m_spacingHeight);
+                m_cells.AddFirst(lastCell);
+                m_cells.RemoveLast();
+                lastCell = m_cells.Last.Value;
+            }
+        }
+        
+        m_contentPos = contentRT.anchoredPosition.y;
+        //Logger.PrintWarning("m_contentPos 2:" + m_contentPos);
+    }
+
+    private void UpdateCellForIndex(CellItemWidget cell, int index)
+    {
+        cell.index = index;
+        cell.name = index.ToString();
+
+        if (cell.index >= 0 && cell.index <= m_dataList.Count - 1)
+        {
+            cell.gameObject.SetActive(true);
+            //更新数据 cell.UpdateContent
+            m_onUpdateCellData(cell.gameObject, m_dataList[cell.index], cell.index);
+            cell.Height = CellHeightAtIndex(cell.index);
+        }
+        else
+            cell.gameObject.SetActive(false);
+    }
+
+    private Dictionary<int, float> m_cellHeightDict = new Dictionary<int, float>();
+    public void SetCellHeightAtIndex(int index, float height)
+    {
+        m_cellHeightDict[index] = height;
+        //UpdateContentSize();
+    }
+
+    private float CellHeightAtIndex(int index)
+    {
+        //TODO
+        if (m_cellHeightDict.ContainsKey(index))
+            return m_cellHeightDict[index];
+        else
+            return 600f;
+    }
+
+    private void FillVisibleRectWithCells()
+    {
+        if (m_cells.Count < 1)
+            return;
+
+        CellItemWidget lastCell = m_cells.Last.Value;
+        int nextCellIndex = lastCell.index + 1;
+        Vector2 nextCellTop = lastCell.Bottom + new Vector2(0f, -m_spacingHeight);
+
+        while (nextCellIndex < m_dataList.Count && nextCellTop.y >= m_visibleRect.y - m_visibleRect.height)
+        {
+            CellItemWidget cell = CreateCellForIndex(nextCellIndex);
+            cell.Top = nextCellTop;
+
+            lastCell = cell;
+            nextCellIndex = lastCell.index + 1;
+            nextCellTop = lastCell.Bottom + new Vector2(0f, -m_spacingHeight);
+        }
+    }
+
+    private CellItemWidget CreateCellForIndex(int index)
+    {
+        GameObject obj = Instantiate(m_cellBase.gameObject) as GameObject;
+        CellItemWidget cell = obj.GetComponent<CellItemWidget>();
+
+        Vector3 scale = cell.transform.localScale;
+        Vector2 sizeDelta = cell.rt.sizeDelta;
+        Vector2 offsetMin = cell.rt.offsetMin;
+        Vector2 offsetMax = cell.rt.offsetMax;
+
+        cell.transform.SetParent(m_cellBase.transform.parent);
+
+        cell.transform.localScale = scale;
+        cell.rt.sizeDelta = sizeDelta;
+        cell.rt.offsetMin = offsetMin;
+        cell.rt.offsetMax = offsetMax;
+
+        UpdateCellForIndex(cell, index);
+
+        m_cells.AddLast(cell);
+
+        return cell;
+    }
+
+    public void SetCellData(List<object> p_dataList, Action<GameObject, object, int> onUpdateCellData)
+    {
+        m_dataList.Clear();
+        
+        for (int i = 0; i < p_dataList.Count; ++i)
+        {
+            object obj = p_dataList[i] as object;
+            m_dataList.Add(obj);
+        }
+
+        m_onUpdateCellData = onUpdateCellData;
+
+        //这里必须执行2次UpdateContent();
+        UpdateContent();
+        UpdateContent();
+
+        ResetContentPos();
+    }
+
+    private void UpdateContent()
+    {
+        UpdateContentSize();
+        UpdateVisibleRect();
+
+        if (m_cells.Count < 1)
+        {
+            Vector2 cellTop = new Vector2(0, -m_padding.top);
+            for (int i = 0, count = m_dataList.Count; i < count; ++i)
+            {
+                float cellHeight = CellHeightAtIndex(i);
+                Vector2 cellBottom = cellTop + new Vector2(0, -cellHeight);
+                if ((cellTop.y <= m_visibleRect.y && cellTop.y >= m_visibleRect.y - m_visibleRect.height) ||
+                    (cellBottom.y <= m_visibleRect.y && cellBottom.y >= m_visibleRect.y - m_visibleRect.height))
+                {
+                    CellItemWidget cell = CreateCellForIndex(i);
+                    cell.Top = cellTop;
+                    break;
+                }
+                cellTop = cellBottom + new Vector2(0f, m_spacingHeight);
+            }
+
+            FillVisibleRectWithCells();
+        }
+        else
+        {
+            LinkedListNode<CellItemWidget> node = m_cells.First;
+            UpdateCellForIndex(node.Value, node.Value.index);
+            node = node.Next;
+
+            while (node != null)
+            {
+                UpdateCellForIndex(node.Value, node.Previous.Value.index + 1);
+                node.Value.Top = node.Previous.Value.Bottom + new Vector2(0, -m_spacingHeight);
+                node = node.Next;
+            }
+
+            FillVisibleRectWithCells();
+        }
+    }
+
+    private void UpdateContentSize()
+    {
+        float contentHeight = 0f;
+        for (int i = 0, count = m_dataList.Count; i < count; ++i)
+        {
+            contentHeight += CellHeightAtIndex(i);
+            if (i > 0)
+                contentHeight += m_spacingHeight;
+        }
+
+        Vector2 sizeDelta = contentRT.sizeDelta;
+        sizeDelta.y = m_padding.top + contentHeight + m_padding.bottom;
+        if (sizeDelta.y < scrollRT.sizeDelta.y)
+            sizeDelta.y = scrollRT.sizeDelta.y;
+        contentRT.sizeDelta = sizeDelta;
+    }
+    
+    private void ResetContentPos()
+    {
+        //如果接近置底，则置底，否则尽量保持原状
+        float contentH = contentRT.sizeDelta.y;
+        float scrollH = scrollRT.sizeDelta.y;
+        if (contentH > scrollH)
+        {
+            int count = m_dataList.Count;
+            if (count >= 2 && contentH - scrollH - m_contentPos <= CellHeightAtIndex(count - 2) + CellHeightAtIndex(count - 1))
+            {
+                //置底
+                contentRT.anchoredPosition = new Vector2(0f, (contentH - scrollH) / 2f);
+                m_contentPos = (contentH - scrollH) / 2f;
+                //Logger.PrintWarning("m_contentPos 1:" + m_contentPos);
+            }
+            else
+            {
+                contentRT.anchoredPosition = new Vector2(0f, (scrollH - contentH) / 2f - m_contentPos);
+            }
+        }
+    }
+}

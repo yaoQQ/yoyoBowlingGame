@@ -1,0 +1,81 @@
+﻿MapPos = {}
+local this = MapPos
+
+function this:new(lng, lat)
+	if lng == nil or lat == nil then
+		printError("MapPos创建失败：坐标为nil")
+		return nil
+	end
+	local o = { }
+	setmetatable(o, self)
+	self.__index = self
+	o:init(lng, lat)
+	return o
+end
+
+this.lng = 0
+this.lat = 0
+this.tilePoses = {}
+this.offsetX = 0
+this.offsetY = 0
+
+function this:init(lng, lat)
+	self.lng = lng
+	self.lat = lat
+	self.tilePoses = {}
+	self.offsetX = 0
+	self.offsetY = 0
+end
+
+function this:setOffset(x, y)
+	self.offsetX = x
+	self.offsetY = y
+end
+
+function this:updateLnglat(lng, lat)
+	if lng == nil or lat == nil then
+		printError("MapPos更新坐标失败：坐标为nil")
+		return
+	end
+	if self.lng ~= lng or self.lat ~= lat then
+		self.tilePoses = {}
+	end
+	self.lng = lng
+	self.lat = lat
+end
+
+--获取相对于屏幕中心的屏幕坐标
+--return x, y
+function this:getScreenPosFromCenter()
+	local zoom = MapManager.zoom
+	if self.tilePoses[zoom] == nil then
+		local tileX, tileY, pixelX, pixelY = MapManager.LatLngToTileXY(self.lng, self.lat, zoom)
+		self.tilePoses[zoom] = {}
+		self.tilePoses[zoom].tileX = tileX
+		self.tilePoses[zoom].tileY = tileY
+		self.tilePoses[zoom].pixelX = pixelX
+		self.tilePoses[zoom].pixelY = pixelY
+	end
+	local tilepos = self.tilePoses[zoom]
+	local x, y = MapManager.getScreenPosFromCenter(zoom, tilepos.tileX, tilepos.tileY, tilepos.pixelX, tilepos.pixelY)
+	return x + self.offsetX, y + self.offsetY
+end
+
+--获取图标缩放比例
+function this:getScale()
+	if not Main.is3DMap then
+		return Vector3(1, 1, 1)
+	end
+
+	local zoom = MapManager.zoom
+	if self.tilePoses[zoom] == nil then
+		local tileX, tileY, pixelX, pixelY = MapManager.LatLngToTileXY(self.lng, self.lat, zoom)
+		self.tilePoses[zoom] = {}
+		self.tilePoses[zoom].tileX = tileX
+		self.tilePoses[zoom].tileY = tileY
+		self.tilePoses[zoom].pixelX = pixelX
+		self.tilePoses[zoom].pixelY = pixelY
+	end
+	local tilepos = self.tilePoses[zoom]
+	return MapManager.getScale3D(zoom, tilepos.tileX, tilepos.tileY, tilepos.pixelX, tilepos.pixelY)
+end

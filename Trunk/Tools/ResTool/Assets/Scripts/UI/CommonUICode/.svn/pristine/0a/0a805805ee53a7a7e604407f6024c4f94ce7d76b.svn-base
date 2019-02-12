@@ -1,0 +1,141 @@
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.UI;
+
+public class UIExEventTest : MonoBehaviour
+{
+
+    // Use this for initialization
+    Image curSelected = null;
+    public GameObject targetObj;
+    private Dictionary<int, RectTransform> FrameBounds = new Dictionary<int, RectTransform>();
+
+    void Start()
+    {
+        //UIExEventListener.Get(gameObject).onLongClick += onLongClickHandler;
+        if (this.targetObj != null)
+        {
+            var group = this.targetObj.transform.Find("CellGroup").GetComponent<CellGroupWidget>();
+            if (group != null)
+            {
+                for (var i = 0; i < group.cellItemArr.Length; i++)
+                {
+                    var item = group.cellItemArr[i].transform.Find("photo_image").GetComponent<Image>();
+                    UIExEventListener.Get(item.gameObject).onLongClick += onLongClickHandler;
+                    UIExEventListener.Get(item.gameObject).onDrag += onDragHandler;
+                    UIExEventListener.Get(item.gameObject).onPointerUp += onPointerUpHandler;
+                }
+            }
+        }
+        //UIExEventListener.Get(gameObject).onDoubleClick += (eventData) => { Debug.Log("双击"); };
+        UIExEventListener.Get(gameObject).onShortClick += (eventData) => { Debug.Log("短按"); };
+        UIExEventListener.Get(gameObject).onDragBegin += (eventData) => { Debug.Log("滑动开始"); };
+        //UIExEventListener.Get(gameObject).onDrag += onDragHandler;
+        UIExEventListener.Get(gameObject).onDragEnd += (eventData) => { Debug.Log("滑动结束"); };
+        //UIExEventListener.Get(gameObject).onPointerUp += onPointerUpHandler;
+        //UIExEventListener.Get(gameObject).onPointerDown += onPointerDownHandler;
+
+        InitBounds();
+    }
+
+    void InitBounds()
+    {
+        if (this.targetObj != null)
+        {
+            var group = this.targetObj.transform.Find("CellGroup").GetComponent<CellGroupWidget>();
+            if (group != null)
+            {
+                for (var i = 0; i < group.cellItemArr.Length; i++)
+                {
+                    var rt = group.cellItemArr[i].transform as RectTransform;
+                    this.FrameBounds.Add(i, rt);
+                    Debug.LogFormat("x:{0}, y:{1}, w:{2}, h:{3}", rt.rect.x, rt.rect.y, rt.rect.width, rt.rect.height);
+                }
+            }
+        }
+    }
+
+    int GetIndexFromPointer(PointerEventData eventData)
+    {
+        int index = -1;
+        foreach (var t in this.FrameBounds)
+        {
+            if (RectTransformUtility.RectangleContainsScreenPoint(t.Value, eventData.position, eventData.pressEventCamera))
+            {
+                index = t.Key;
+                break;
+            }
+        }
+        return index;
+    }
+
+    private void onPointerDownHandler(PointerEventData obj)
+    {
+
+    }
+
+    void onLongClickHandler(PointerEventData eventData)
+    {
+        if (this.curSelected == null)
+        {
+            var local = UIExEventTool.ScreenToTargetLocal(eventData.pointerCurrentRaycast.gameObject, eventData.pointerCurrentRaycast.gameObject.transform.parent.gameObject, eventData.position, eventData.pressEventCamera);
+            if (local != new Vector2(99999, 99999))
+            {
+
+                Debug.Log("长按点的局部坐标 = " + local);
+                this.curSelected = eventData.pointerCurrentRaycast.gameObject.GetComponent<Image>();
+                this.curSelected.rectTransform.anchoredPosition = local;
+            }
+            //Vector3 world = UIExEventTool.ScreenToWorld(eventData.pointerCurrentRaycast.gameObject, eventData.position, eventData.pressEventCamera);
+            //if (world != new Vector3(99999, 99999, 99999))
+            //{
+            //    Debug.Log("长按点的世界坐标 = " + world);
+            //    this.curSelected = eventData.pointerCurrentRaycast.gameObject.GetComponent<Image>();
+            //    //this.curSelected.rectTransform.position = world;
+            //    this.curSelected.rectTransform.anchoredPosition = (Vector2)world;
+            //}
+
+            //Debug.Log("长按点的局部坐标 = " + localPos);
+            //this.curSelected = gameObject.GetComponent<Image>();
+            //this.curSelected.rectTransform.anchoredPosition = local;
+            //StartCoroutine(SelectedCro(this.curSelected, localPos));
+
+        }
+        else
+        {
+            Debug.LogError("长按错误");
+        }
+    }
+
+
+    void onPointerUpHandler(PointerEventData eventData)
+    {
+        if (this.curSelected != null)
+        {
+            //this.curSelected.rectTransform.anchoredPosition = Vector2.zero;
+        }
+        this.curSelected = null;
+    }
+
+    void onDragHandler(PointerEventData eventData)
+    {
+        if (this.curSelected != null)
+        {
+            this.curSelected.rectTransform.anchoredPosition += eventData.delta;
+            var index = GetIndexFromPointer(eventData);
+            if (index != -1)
+            {
+                Debug.Log("进入了边界, 索引index = " + index);
+            }
+        }
+    }
+
+    void viewChangeHandler()
+    {
+
+    }
+
+}

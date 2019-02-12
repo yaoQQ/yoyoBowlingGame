@@ -1,0 +1,99 @@
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.UI;
+using System.Linq;
+
+public class ScrollPageRect : ScrollRect
+{
+    [SerializeField]
+    private bool m_isLoop = false;
+    public bool isLoop
+    {
+        get { return m_isLoop; }
+        set { m_isLoop = value; }
+    }
+
+    private int m_maxPage = 0;
+    private int m_curPage = 0;
+    List<int> m_dataList = new List<int>();
+    Dictionary<int, RectTransform> m_viewList = new Dictionary<int, RectTransform>();
+    public void Init(int maxPage, int curPage)
+    {
+        this.m_maxPage = maxPage;
+        m_curPage = curPage;
+        var centerPage = maxPage / 2;
+        var offset = curPage - centerPage;
+        for (var i = 0; i < maxPage; i++)
+        {
+            var data = (i + offset);
+            if (data < 0)
+                data = data + maxPage;
+            m_dataList.Add(data);
+        }
+        if (this.content != null)
+        {
+            for (var i = 0; i < content.childCount; i++)
+            {
+                var view = content.GetChild(i) as RectTransform;
+
+                m_viewList.Add(i, view);
+            }
+            // 根据数据来显示视图
+            for (var i = 0; i < m_dataList.Count; i++)
+            {
+                var view = this.content.GetChild(i);
+                if (view == null)
+                    continue;
+                var text = view.GetComponent<Text>();
+                text.text = string.Format("{0}", m_dataList[i]);
+            }
+        }
+
+    }
+
+    public override void StopMovement()
+    {
+        base.StopMovement();
+        var index = FindNearIndex();
+        var data = m_dataList[index];
+        Debug.Log("停下, 当前最近的为 data = "+ data);
+    }
+
+    private int FindNearIndex()
+    {
+        var position = content.anchoredPosition;
+        var sort = (from i in m_viewList
+                     orderby Mathf.Abs(position.y - i.Value.anchoredPosition.y)
+                    select i ).ToList();
+        return sort.FirstOrDefault().Key;
+    }
+    protected override void Start()
+    {
+        this.onValueChanged.AddListener(handler);
+        Init(24, 10);
+    }
+
+    private Vector2 pre;
+    private void handler(Vector2 arg0)
+    {
+        if (pre == arg0)
+        {
+            this.StopMovement();
+            if (arg0.y >= 1)
+            {
+                Debug.Log("到顶部了");
+                this.SetContentAnchoredPosition(new Vector2(0, 1200f));
+            }
+            else if (arg0.y <= 0)
+            {
+                Debug.Log("到底部了");
+                this.SetContentAnchoredPosition(new Vector2(0, 1200f));
+            }
+        }
+        pre = arg0;
+
+    }
+}

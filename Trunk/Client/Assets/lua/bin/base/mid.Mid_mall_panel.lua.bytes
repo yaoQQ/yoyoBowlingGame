@@ -1,0 +1,22 @@
+local ButtonWidget=CS.ButtonWidget
+
+Mid_mall_panel={}
+local this = Mid_mall_panel
+
+function this:new(gameObject)
+	local o = { }
+	setmetatable(o, self)
+	self.__index = self
+	o:init(gameObject)
+	return o
+end
+
+this.go = nil
+this.btn_close=nil
+
+function this:init(gameObject)
+	self.go=gameObject
+	self.btn_close=self.go.transform:Find("btn_close"):GetComponent(typeof(ButtonWidget))
+end
+
+

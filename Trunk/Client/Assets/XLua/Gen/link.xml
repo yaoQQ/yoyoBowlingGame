@@ -1,0 +1,180 @@
+﻿
+
+<linker>
+
+	<assembly fullname="DOTween">
+	    <type fullname="DG.Tweening.AutoPlay" preserve="all"/>
+		<type fullname="DG.Tweening.AxisConstraint" preserve="all"/>
+		<type fullname="DG.Tweening.Ease" preserve="all"/>
+		<type fullname="DG.Tweening.LogBehaviour" preserve="all"/>
+		<type fullname="DG.Tweening.LoopType" preserve="all"/>
+		<type fullname="DG.Tweening.PathMode" preserve="all"/>
+		<type fullname="DG.Tweening.PathType" preserve="all"/>
+		<type fullname="DG.Tweening.RotateMode" preserve="all"/>
+		<type fullname="DG.Tweening.ScrambleMode" preserve="all"/>
+		<type fullname="DG.Tweening.TweenType" preserve="all"/>
+		<type fullname="DG.Tweening.UpdateType" preserve="all"/>
+		<type fullname="DG.Tweening.DOTween" preserve="all"/>
+		<type fullname="DG.Tweening.DOVirtual" preserve="all"/>
+		<type fullname="DG.Tweening.EaseFactory" preserve="all"/>
+		<type fullname="DG.Tweening.Tweener" preserve="all"/>
+		<type fullname="DG.Tweening.Tween" preserve="all"/>
+		<type fullname="DG.Tweening.Sequence" preserve="all"/>
+		<type fullname="DG.Tweening.TweenParams" preserve="all"/>
+		<type fullname="DG.Tweening.Core.ABSSequentiable" preserve="all"/>
+		<type fullname="DG.Tweening.Core.TweenerCore`3[UnityEngine.Vector3,UnityEngine.Vector3,DG.Tweening.Plugins.Options.VectorOptions]" preserve="all"/>
+		<type fullname="DG.Tweening.TweenExtensions" preserve="all"/>
+		<type fullname="DG.Tweening.TweenSettingsExtensions" preserve="all"/>
+		<type fullname="DG.Tweening.ShortcutExtensions" preserve="all"/>
+		
+	</assembly>
+
+	<assembly fullname="DOTween43">
+	    <type fullname="DG.Tweening.ShortcutExtensions43" preserve="all"/>
+		
+	</assembly>
+
+	<assembly fullname="DOTween46">
+	    <type fullname="DG.Tweening.ShortcutExtensions46" preserve="all"/>
+		
+	</assembly>
+
+	<assembly fullname="DOTween50">
+	    <type fullname="DG.Tweening.ShortcutExtensions50" preserve="all"/>
+		
+	</assembly>
+
+	<assembly fullname="mscorlib">
+	    <type fullname="System.DateTime" preserve="all"/>
+		
+	</assembly>
+
+	<assembly fullname="UnityEngine">
+	    <type fullname="UnityEngine.KeyCode" preserve="all"/>
+		<type fullname="UnityEngine.TouchPhase" preserve="all"/>
+		<type fullname="UnityEngine.Animator" preserve="all"/>
+		<type fullname="UnityEngine.Camera" preserve="all"/>
+		<type fullname="UnityEngine.Collider2D" preserve="all"/>
+		<type fullname="UnityEngine.Collision2D" preserve="all"/>
+		<type fullname="UnityEngine.Color" preserve="all"/>
+		<type fullname="UnityEngine.ContactPoint2D" preserve="all"/>
+		<type fullname="UnityEngine.GameObject" preserve="all"/>
+		<type fullname="UnityEngine.Material" preserve="all"/>
+		<type fullname="UnityEngine.MeshFilter" preserve="all"/>
+		<type fullname="UnityEngine.MeshRenderer" preserve="all"/>
+		<type fullname="UnityEngine.Physics2D" preserve="all"/>
+		<type fullname="UnityEngine.PlayerPrefs" preserve="all"/>
+		<type fullname="UnityEngine.PolygonCollider2D" preserve="all"/>
+		<type fullname="UnityEngine.Quaternion" preserve="all"/>
+		<type fullname="UnityEngine.RaycastHit" preserve="all"/>
+		<type fullname="UnityEngine.RectTransform" preserve="all"/>
+		<type fullname="UnityEngine.Renderer" preserve="all"/>
+		<type fullname="UnityEngine.Rigidbody2D" preserve="all"/>
+		<type fullname="UnityEngine.Sprite" preserve="all"/>
+		<type fullname="UnityEngine.SpriteRenderer" preserve="all"/>
+		<type fullname="UnityEngine.Time" preserve="all"/>
+		<type fullname="UnityEngine.TrailRenderer" preserve="all"/>
+		<type fullname="UnityEngine.Transform" preserve="all"/>
+		<type fullname="UnityEngine.Vector2" preserve="all"/>
+		<type fullname="UnityEngine.Vector3" preserve="all"/>
+		
+	</assembly>
+
+	<assembly fullname="UnityEngine.UI">
+	    <type fullname="UnityEngine.UI.Image" preserve="all"/>
+		<type fullname="UnityEngine.UI.ToggleGroup" preserve="all"/>
+		
+	</assembly>
+
+	<assembly fullname="Assembly-CSharp">
+	    <type fullname="EZReplayManager" preserve="all"/>
+		<type fullname="testManage" preserve="all"/>
+		<type fullname="LoadManager" preserve="all"/>
+		<type fullname="DeviceUtil" preserve="all"/>
+		<type fullname="ImageEvent" preserve="all"/>
+		<type fullname="ImageUtil" preserve="all"/>
+		<type fullname="Loger" preserve="all"/>
+		<type fullname="MeshUtil" preserve="all"/>
+		<type fullname="Tween" preserve="all"/>
+		<type fullname="UITools" preserve="all"/>
+		<type fullname="UtilMethod" preserve="all"/>
+		<type fullname="GameProcessManager" preserve="all"/>
+		<type fullname="PhysicGameManager" preserve="all"/>
+		<type fullname="InputManager" preserve="all"/>
+		<type fullname="SceneClickNotice" preserve="all"/>
+		<type fullname="LuaActionController" preserve="all"/>
+		<type fullname="MapManager" preserve="all"/>
+		<type fullname="ModuleManager" preserve="all"/>
+		<type fullname="NetResDownloadManager" preserve="all"/>
+		<type fullname="AliyunOSSManager" preserve="all"/>
+		<type fullname="HttpPostManager" preserve="all"/>
+		<type fullname="JavaNetWorkManager" preserve="all"/>
+		<type fullname="JsonPackage" preserve="all"/>
+		<type fullname="NetworkManager" preserve="all"/>
+		<type fullname="Package" preserve="all"/>
+		<type fullname="NetworkEventManager" preserve="all"/>
+		<type fullname="NoticeManager" preserve="all"/>
+		<type fullname="ObjectNotice" preserve="all"/>
+		<type fullname="ObjectPoolManager" preserve="all"/>
+		<type fullname="PreloadManager" preserve="all"/>
+		<type fullname="AudioManager" preserve="all"/>
+		<type fullname="RecordManager" preserve="all"/>
+		<type fullname="EffectManager" preserve="all"/>
+		<type fullname="ModelManager" preserve="all"/>
+		<type fullname="ResReleaseManager" preserve="all"/>
+		<type fullname="SceneCamera" preserve="all"/>
+		<type fullname="SceneCell" preserve="all"/>
+		<type fullname="SceneContainer" preserve="all"/>
+		<type fullname="SceneEntity" preserve="all"/>
+		<type fullname="ScenePosPoint" preserve="all"/>
+		<type fullname="SceneManager" preserve="all"/>
+		<type fullname="UILoadControl" preserve="all"/>
+		<type fullname="UIManager" preserve="all"/>
+		<type fullname="ResDownLoadContoller" preserve="all"/>
+		<type fullname="LoadingBarController" preserve="all"/>
+		<type fullname="PlatformSDK" preserve="all"/>
+		<type fullname="SQLiteManager" preserve="all"/>
+		<type fullname="ScreenSnapManager" preserve="all"/>
+		<type fullname="DisableTermsManager" preserve="all"/>
+		<type fullname="GlobalTimeManager" preserve="all"/>
+		<type fullname="TimeManager" preserve="all"/>
+		<type fullname="UIViewManager" preserve="all"/>
+		<type fullname="ButtonWidget" preserve="all"/>
+		<type fullname="CellGroupWidget" preserve="all"/>
+		<type fullname="CellItemWidget" preserve="all"/>
+		<type fullname="CellRecycleNewScrollWidget" preserve="all"/>
+		<type fullname="CellRecycleScrollWidget" preserve="all"/>
+		<type fullname="CircleImageWidget" preserve="all"/>
+		<type fullname="EffectWidget" preserve="all"/>
+		<type fullname="EmptyImageWidget" preserve="all"/>
+		<type fullname="UICustomEvent" preserve="all"/>
+		<type fullname="UIEvent" preserve="all"/>
+		<type fullname="UISpineEvent" preserve="all"/>
+		<type fullname="GridRecycleScrollWidget" preserve="all"/>
+		<type fullname="HorizontalLayoutGroupWidget" preserve="all"/>
+		<type fullname="IconWidget" preserve="all"/>
+		<type fullname="ImageWidget" preserve="all"/>
+		<type fullname="InputFieldWidget" preserve="all"/>
+		<type fullname="MarqueeWidget" preserve="all"/>
+		<type fullname="MaskWidget" preserve="all"/>
+		<type fullname="PanelWidget" preserve="all"/>
+		<type fullname="RawImageWidget" preserve="all"/>
+		<type fullname="ScrollPanelWidget" preserve="all"/>
+		<type fullname="ScrollPanelWithButtonWidget" preserve="all"/>
+		<type fullname="SliderWidget" preserve="all"/>
+		<type fullname="SpineWidget" preserve="all"/>
+		<type fullname="TabPanelWidget" preserve="all"/>
+		<type fullname="TextPicWidget" preserve="all"/>
+		<type fullname="TextWidget" preserve="all"/>
+		<type fullname="ToggleWidget" preserve="all"/>
+		<type fullname="VerticalLayoutGroupWidget" preserve="all"/>
+		<type fullname="AnimationWidget" preserve="all"/>
+		<type fullname="AnimatorWidget" preserve="all"/>
+		<type fullname="BannerWidget" preserve="all"/>
+		<type fullname="NumberPickerWidget" preserve="all"/>
+		<type fullname="UIExEventTool" preserve="all"/>
+		<type fullname="UIBaseMono" preserve="all"/>
+		
+	</assembly>
+
+</linker>

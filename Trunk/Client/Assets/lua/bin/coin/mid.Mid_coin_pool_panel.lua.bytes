@@ -1,0 +1,27 @@
+local IconWidget=CS.IconWidget
+local ImageWidget=CS.ImageWidget
+
+Mid_coin_pool_panel={}
+local this = Mid_coin_pool_panel
+
+function this:new(gameObject)
+	local o = { }
+	setmetatable(o, self)
+	self.__index = self
+	o:init(gameObject)
+	return o
+end
+
+this.go = nil
+this.coin_icon=nil
+this.coinItem=nil
+this.timer_icon=nil
+
+function this:init(gameObject)
+	self.go=gameObject
+	self.coin_icon=self.go.transform:Find("coin_icon"):GetComponent(typeof(IconWidget))
+	self.coinItem=self.go.transform:Find("coinItem"):GetComponent(typeof(ImageWidget))
+	self.timer_icon=self.go.transform:Find("timer_icon"):GetComponent(typeof(IconWidget))
+end
+
+

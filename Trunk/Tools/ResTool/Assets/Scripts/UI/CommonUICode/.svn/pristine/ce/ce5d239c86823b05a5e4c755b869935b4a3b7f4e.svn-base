@@ -1,0 +1,30 @@
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.EventSystems;
+
+public class EmptyImageWidget : UIBaseWidget {
+
+    public override bool AddEventListener(UIEvent eventType, Action<PointerEventData> onEventHandler)
+    {
+        bool sign = true;
+        switch (eventType)
+        {
+            case UIEvent.PointerClick:
+                PointerClickListener.Get(gameObject).onHandler = onEventHandler;
+                break;
+            default:
+                sign = false;
+                break;
+        }
+        return sign;
+    }
+
+
+    public override WidgetType GetWidgetType()
+    {
+        return WidgetType.EmptyImage;
+    }
+}
+

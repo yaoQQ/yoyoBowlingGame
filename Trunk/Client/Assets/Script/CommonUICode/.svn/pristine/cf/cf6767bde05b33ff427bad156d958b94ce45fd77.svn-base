@@ -1,0 +1,25 @@
+﻿using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.UI;
+using UnityEngine.EventSystems;
+
+
+public class GridLayoutGroupWidget : UIBaseWidget
+{
+    public override WidgetType GetWidgetType()
+    {
+        return WidgetType.GridLayout;
+    }
+
+    public GridLayoutGroup InnerGridGroup;
+
+    public override bool AddEventListener(UIEvent eventType, System.Action<UnityEngine.EventSystems.PointerEventData> onEventHandler)
+    {
+        // bool sign = true;
+        return false;
+    }
+    public override bool RemoveEventListener(UIEvent eventType, System.Action<PointerEventData> onEventHandler) {
+        return false;
+    }
+}

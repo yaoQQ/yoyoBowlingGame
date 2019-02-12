@@ -1,0 +1,111 @@
+﻿using System;
+using UnityEngine.EventSystems;
+using UnityEngine.UI;
+using UnityEngine.UI.Extensions;
+#if !TOOL
+using XLua;
+
+[LuaCallCSharp]
+#endif
+public class InputFieldWidget : UIBaseWidget
+{
+    public InputField inputField;
+    Action<object> confirmHandler;
+
+    public override bool AddEventListener(UIEvent eventType, Action<PointerEventData> onEventHandler) {
+        bool sign = true;
+        switch (eventType) {
+            case UIEvent.PointerClick:
+                PointerClickListener.Get(gameObject).onHandler = onEventHandler;
+                break;
+            default:
+                sign = false;
+                break;
+        }
+        return sign;
+    }
+    public override bool RemoveEventListener(UIEvent eventType, System.Action<PointerEventData> onEventHandler) {
+        bool sign = true;
+        switch (eventType) {
+            case UIEvent.PointerClick:
+                PointerClickListener.Get(gameObject).onHandler = null;
+                break;
+            default:
+                sign = false;
+                break;
+        }
+        return sign;
+    }
+
+    public override bool AddCustomEventListener(UICustomEvent eventType, Action<object> onEventHandler) {
+        bool sign = true;
+        switch (eventType) {
+            case UICustomEvent.Confirm:
+                EventTriggerListener.Get(gameObject).onSubmit = onEventHandler;
+                break;
+            case UICustomEvent.Complete:
+                EventTriggerListener.Get(gameObject).onDeselect = onEventHandler;
+                break;
+            default:
+                sign = false;
+                break;
+        }
+        return sign;
+    }
+
+    public void OnValueChanged(Action<object> onEventHandler) {
+        inputField.onValueChanged.RemoveAllListeners();
+        inputField.onValueChanged.AddListener((s) => {
+            if (onEventHandler != null) {
+                onEventHandler(gameObject);
+            }
+        });
+    }
+
+
+    public void OnEndEdit(Action<object> onEventHandler) {
+        inputField.onEndEdit.RemoveAllListeners();
+        inputField.onEndEdit.AddListener((s) => {
+            if (onEventHandler != null) {
+                onEventHandler(gameObject);
+            }
+        });
+    }
+
+    public override WidgetType GetWidgetType() {
+        return WidgetType.InputField;
+    }
+
+    public string text
+    {
+        get
+        {
+            return inputField.text;
+        }
+
+        set
+        {
+            inputField.text = value;
+        }
+    }
+
+    public void AcitivateInputField()
+    {
+        if (null!=inputField)
+        {
+            inputField.ActivateInputField();
+        }
+    }
+
+    //这是针对text组件是要带图文混排的textPic，这个方法的作用是给textPic的iconlist指定对应的key value值
+    public void SetIconList(TextPic.IconName[] iconName) {
+        var textPic = inputField.textComponent as TextPic;
+        if (textPic != null) {
+            textPic.SetIconList(iconName);
+        }
+    }
+
+    void OnDestroy() {
+        confirmHandler = null;
+    }
+}

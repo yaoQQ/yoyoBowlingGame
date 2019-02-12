@@ -1,0 +1,77 @@
+﻿local EmptyImageWidget=CS.EmptyImageWidget
+local ImageWidget=CS.ImageWidget
+local TextWidget=CS.TextWidget
+local ButtonWidget=CS.ButtonWidget
+local InputFieldWidget=CS.InputFieldWidget
+local CellGroupWidget=CS.CellGroupWidget
+local CircleImageWidget=CS.CircleImageWidget
+local IconWidget=CS.IconWidget
+
+Mid_platform_friend_recommend_panel={}
+local this = Mid_platform_friend_recommend_panel
+
+function this:new(gameObject)
+	local o = { }
+	setmetatable(o, self)
+	self.__index = self
+	o:init(gameObject)
+	return o
+end
+
+this.go = nil
+this.back_Image=nil
+this.single_Image=nil
+this.single_Text=nil
+this.group_Text=nil
+this.scan_Button=nil
+this.myscanpic_Image=nil
+this.wechat_Button=nil
+this.qq_Button=nil
+this.search_InputField=nil
+this.recommend_Image=nil
+this.frienddes_Text=nil
+this.recommend_CellGroup=nil
+this.change_Image=nil
+this.nomorerecommend_Text=nil
+--Newrecommendcell数组
+this.newrecommendcellArr={}
+
+function this:init(gameObject)
+	self.go=gameObject
+	self.back_Image=self.go.transform:Find("top_Panel/back_Image/back_Image"):GetComponent(typeof(EmptyImageWidget))
+	self.single_Image=self.go.transform:Find("top_Panel/single_Image"):GetComponent(typeof(ImageWidget))
+	self.single_Text=self.go.transform:Find("top_Panel/single_Image/single_Text"):GetComponent(typeof(TextWidget))
+	self.group_Text=self.go.transform:Find("top_Panel/group_Text"):GetComponent(typeof(TextWidget))
+	self.scan_Button=self.go.transform:Find("ScrollPanel/content/single_panel/scan_Button"):GetComponent(typeof(ButtonWidget))
+	self.myscanpic_Image=self.go.transform:Find("ScrollPanel/content/single_panel/myscanpic_Image"):GetComponent(typeof(ImageWidget))
+	self.wechat_Button=self.go.transform:Find("ScrollPanel/content/single_panel/wechat_Button"):GetComponent(typeof(ButtonWidget))
+	self.qq_Button=self.go.transform:Find("ScrollPanel/content/single_panel/qq_Button"):GetComponent(typeof(ButtonWidget))
+	self.search_InputField=self.go.transform:Find("ScrollPanel/content/single_panel/search_InputField"):GetComponent(typeof(InputFieldWidget))
+	self.recommend_Image=self.go.transform:Find("ScrollPanel/content/single_panel/recommend_Image"):GetComponent(typeof(ImageWidget))
+	self.frienddes_Text=self.go.transform:Find("ScrollPanel/content/single_panel/recommend_Image/frienddes_Text"):GetComponent(typeof(TextWidget))
+	self.recommend_CellGroup=self.go.transform:Find("ScrollPanel/content/single_panel/recommend_Image/recommend_CellGroup"):GetComponent(typeof(CellGroupWidget))
+	self.change_Image=self.go.transform:Find("ScrollPanel/content/single_panel/recommend_Image/change_Image"):GetComponent(typeof(ImageWidget))
+	self.nomorerecommend_Text=self.go.transform:Find("ScrollPanel/content/single_panel/recommend_Image/nomorerecommend_Text"):GetComponent(typeof(TextWidget))
+	self.newrecommendcellArr={}
+	table.insert(self.newrecommendcellArr,self.new_Newrecommendcell(self.go.transform:Find("ScrollPanel/content/single_panel/recommend_Image/recommend_CellGroup/cellitem").gameObject))
+	table.insert(self.newrecommendcellArr,self.new_Newrecommendcell(self.go.transform:Find("ScrollPanel/content/single_panel/recommend_Image/recommend_CellGroup/cellitem_1").gameObject))
+	table.insert(self.newrecommendcellArr,self.new_Newrecommendcell(self.go.transform:Find("ScrollPanel/content/single_panel/recommend_Image/recommend_CellGroup/cellitem_2").gameObject))
+	table.insert(self.newrecommendcellArr,self.new_Newrecommendcell(self.go.transform:Find("ScrollPanel/content/single_panel/recommend_Image/recommend_CellGroup/cellitem_3").gameObject))
+	table.insert(self.newrecommendcellArr,self.new_Newrecommendcell(self.go.transform:Find("ScrollPanel/content/single_panel/recommend_Image/recommend_CellGroup/cellitem_4").gameObject))
+	table.insert(self.newrecommendcellArr,self.new_Newrecommendcell(self.go.transform:Find("ScrollPanel/content/single_panel/recommend_Image/recommend_CellGroup/cellitem_5").gameObject))
+end
+
+--Newrecommendcell复用单元
+function this.new_Newrecommendcell(itemGo)
+	local item = { }
+	item.go = itemGo
+	item.press_Image=itemGo.transform:Find("press_Image"):GetComponent(typeof(ImageWidget))
+	item.head_Image=itemGo.transform:Find("head_Image"):GetComponent(typeof(CircleImageWidget))
+	item.name_Text=itemGo.transform:Find("name_Text"):GetComponent(typeof(TextWidget))
+	item.sex_Image=itemGo.transform:Find("sex_Image"):GetComponent(typeof(ImageWidget))
+	item.sexbg_Icon=itemGo.transform:Find("sex_Image/sexbg_Icon"):GetComponent(typeof(IconWidget))
+	item.level_Text=itemGo.transform:Find("sex_Image/Image/level_Text"):GetComponent(typeof(TextWidget))
+	item.adress_Text=itemGo.transform:Find("adress_Text"):GetComponent(typeof(TextWidget))
+	return item
+end
+

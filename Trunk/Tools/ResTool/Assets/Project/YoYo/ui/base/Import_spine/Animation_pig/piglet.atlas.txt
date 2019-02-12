@@ -1,0 +1,132 @@
+
+piglet.png
+size: 806,398
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+body
+  rotate: false
+  xy: 371, 160
+  size: 245, 236
+  orig: 245, 236
+  offset: 0, 0
+  index: -1
+daizi_01
+  rotate: false
+  xy: 371, 5
+  size: 219, 153
+  orig: 219, 153
+  offset: 0, 0
+  index: -1
+daizi_02
+  rotate: false
+  xy: 2, 2
+  size: 177, 60
+  orig: 177, 60
+  offset: 0, 0
+  index: -1
+daizi_03
+  rotate: true
+  xy: 746, 54
+  size: 42, 46
+  orig: 42, 46
+  offset: 0, 0
+  index: -1
+daizi_04
+  rotate: true
+  xy: 592, 20
+  size: 51, 82
+  orig: 51, 82
+  offset: 0, 0
+  index: -1
+dianzhu
+  rotate: false
+  xy: 2, 64
+  size: 367, 332
+  orig: 367, 332
+  offset: 0, 0
+  index: -1
+face_01
+  rotate: false
+  xy: 746, 98
+  size: 47, 48
+  orig: 47, 48
+  offset: 0, 0
+  index: -1
+face_02
+  rotate: true
+  xy: 181, 2
+  size: 60, 56
+  orig: 60, 56
+  offset: 0, 0
+  index: -1
+hand_01
+  rotate: true
+  xy: 676, 10
+  size: 28, 68
+  orig: 28, 68
+  offset: 0, 0
+  index: -1
+hang_02
+  rotate: true
+  xy: 239, 7
+  size: 55, 113
+  orig: 55, 113
+  offset: 0, 0
+  index: -1
+l_eye
+  rotate: false
+  xy: 746, 28
+  size: 29, 24
+  orig: 29, 24
+  offset: 0, 0
+  index: -1
+leg_01
+  rotate: false
+  xy: 673, 77
+  size: 71, 45
+  orig: 71, 45
+  offset: 0, 0
+  index: -1
+leg_02
+  rotate: false
+  xy: 592, 73
+  size: 79, 85
+  orig: 79, 85
+  offset: 0, 0
+  index: -1
+leg_03
+  rotate: false
+  xy: 676, 40
+  size: 63, 35
+  orig: 63, 35
+  offset: 0, 0
+  index: -1
+mouth
+  rotate: true
+  xy: 743, 148
+  size: 31, 61
+  orig: 31, 61
+  offset: 0, 0
+  index: -1
+nose
+  rotate: false
+  xy: 673, 124
+  size: 68, 55
+  orig: 68, 55
+  offset: 0, 0
+  index: -1
+r_eye
+  rotate: false
+  xy: 746, 4
+  size: 26, 22
+  orig: 26, 22
+  offset: 0, 0
+  index: -1
+tummy_01
+  rotate: true
+  xy: 618, 181
+  size: 215, 167
+  orig: 215, 167
+  offset: 0, 0
+  index: -1

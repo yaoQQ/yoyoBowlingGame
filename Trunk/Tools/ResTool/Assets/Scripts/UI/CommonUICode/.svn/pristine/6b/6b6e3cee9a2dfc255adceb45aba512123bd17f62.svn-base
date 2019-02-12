@@ -1,0 +1,70 @@
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.EventSystems;
+
+public class UIExLongClickListener : UIBehaviour, IPointerDownHandler, IPointerUpHandler, IDragHandler
+{
+    public Action<PointerEventData> onHandler;
+    private GameObject m_lastGo;
+    private GameObject m_currentGo;
+    public static UIExLongClickListener Get(GameObject go)
+    {
+        UIExLongClickListener listener = go.GetComponent<UIExLongClickListener>();
+        if (listener == null) listener = go.AddComponent<UIExLongClickListener>();
+        return listener;
+    }
+
+    [Tooltip("长按界定时间")]
+    public const float longDefinition = 0.5f;
+    private bool isLongPressTriggered = false;
+    private bool isPointerDown = false;
+    private float timePressStarted;
+    private PointerEventData eventData;
+
+    public bool IsLongPressTriggered
+    {
+        get { return isLongPressTriggered; }
+    }
+
+    public void OnPointerDown(PointerEventData eventData)
+    {
+        isPointerDown = true;
+        timePressStarted = Time.unscaledTime;
+        this.eventData = eventData;
+        m_lastGo = eventData.pointerPress;
+        isLongPressTriggered = false;
+    }
+
+    public void OnPointerUp(PointerEventData eventData)
+    {
+        isPointerDown = false;
+        timePressStarted = 0f;
+        m_lastGo = null;
+        m_currentGo = null;
+    }
+
+    void Update()
+    {
+        if (isPointerDown && !isLongPressTriggered)
+        {
+            var curTime = Time.unscaledTime;
+            if (curTime - timePressStarted > longDefinition)
+            {
+                isLongPressTriggered = true;
+                if (m_lastGo == m_currentGo)
+                {
+                    if (onHandler != null && eventData != null)
+                        onHandler.Invoke(eventData);
+                }
+                
+            }
+        }
+    }
+
+    public void OnDrag(PointerEventData eventData)
+    {
+        m_currentGo = eventData.pointerPress;
+    }
+}

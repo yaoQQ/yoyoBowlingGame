@@ -1,0 +1,34 @@
+﻿local ImageWidget=CS.ImageWidget
+local TextWidget=CS.TextWidget
+local ButtonWidget=CS.ButtonWidget
+
+Mid_platform_mall_tip_config_panel={}
+local this = Mid_platform_mall_tip_config_panel
+
+function this:new(gameObject)
+	local o = { }
+	setmetatable(o, self)
+	self.__index = self
+	o:init(gameObject)
+	return o
+end
+
+this.go = nil
+this.mask_Image=nil
+this.bg_image=nil
+this.info_text=nil
+this.btn_2=nil
+this.cost_Text=nil
+this.fen_Text=nil
+
+function this:init(gameObject)
+	self.go=gameObject
+	self.mask_Image=self.go.transform:Find("mask_Image"):GetComponent(typeof(ImageWidget))
+	self.bg_image=self.go.transform:Find("bg_image"):GetComponent(typeof(ImageWidget))
+	self.info_text=self.go.transform:Find("bg_image/info_text"):GetComponent(typeof(TextWidget))
+	self.btn_2=self.go.transform:Find("bg_image/btn_2"):GetComponent(typeof(ButtonWidget))
+	self.cost_Text=self.go.transform:Find("bg_image/cost_Text"):GetComponent(typeof(TextWidget))
+	self.fen_Text=self.go.transform:Find("bg_image/fen_Text"):GetComponent(typeof(TextWidget))
+end
+
+

@@ -1,0 +1,49 @@
+﻿local PanelWidget=CS.PanelWidget
+local TextWidget=CS.TextWidget
+local ImageWidget=CS.ImageWidget
+local ButtonWidget=CS.ButtonWidget
+
+Mid_coin_game_panel={}
+local this = Mid_coin_game_panel
+
+function this:new(gameObject)
+	local o = { }
+	setmetatable(o, self)
+	self.__index = self
+	o:init(gameObject)
+	return o
+end
+
+this.go = nil
+this.coin_game_panel=nil
+this.timer_text=nil
+this.score_text=nil
+this.cal_panel=nil
+this.move_clamp_panel=nil
+this.stack_panel=nil
+this.target_bg=nil
+this.target_text=nil
+this.start_timer_image=nil
+this.exit_image=nil
+this.exit_confirm_panel=nil
+this.exit_confirm_btn=nil
+this.exit_continue_btn=nil
+
+function this:init(gameObject)
+	self.go=gameObject
+	self.coin_game_panel=self.go.transform:Find(""):GetComponent(typeof(PanelWidget))
+	self.timer_text=self.go.transform:Find("bg2/timer_text"):GetComponent(typeof(TextWidget))
+	self.score_text=self.go.transform:Find("bg2/score_text"):GetComponent(typeof(TextWidget))
+	self.cal_panel=self.go.transform:Find("cal_panel"):GetComponent(typeof(PanelWidget))
+	self.move_clamp_panel=self.go.transform:Find("move_clamp_panel"):GetComponent(typeof(PanelWidget))
+	self.stack_panel=self.go.transform:Find("stack_panel"):GetComponent(typeof(PanelWidget))
+	self.target_bg=self.go.transform:Find("target_bg"):GetComponent(typeof(ImageWidget))
+	self.target_text=self.go.transform:Find("target_bg/target_text"):GetComponent(typeof(TextWidget))
+	self.start_timer_image=self.go.transform:Find("start_timer_image"):GetComponent(typeof(ImageWidget))
+	self.exit_image=self.go.transform:Find("exit_image"):GetComponent(typeof(ImageWidget))
+	self.exit_confirm_panel=self.go.transform:Find("exit_confirm_panel"):GetComponent(typeof(PanelWidget))
+	self.exit_confirm_btn=self.go.transform:Find("exit_confirm_panel/bg/exit_confirm_btn"):GetComponent(typeof(ButtonWidget))
+	self.exit_continue_btn=self.go.transform:Find("exit_confirm_panel/bg/exit_continue_btn"):GetComponent(typeof(ButtonWidget))
+end
+
+

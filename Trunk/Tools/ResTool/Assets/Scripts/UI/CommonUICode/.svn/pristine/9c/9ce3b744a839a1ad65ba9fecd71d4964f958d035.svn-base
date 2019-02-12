@@ -1,0 +1,34 @@
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.UI;
+
+public class UIExEventTest : MonoBehaviour
+{
+
+
+    void Start()
+    {
+        UIExLongClickListener.Get(gameObject).onHandler = (eventData) => 
+        {
+            Debug.Log("长按 "+ eventData.pointerPressRaycast.gameObject.name);
+        };
+        //UIExDoubleClickListener.Get(gameObject).onHandler = (eventData) =>
+        //{
+        //    Debug.Log("双击");
+        //};
+        UIExClickListener.Get(gameObject).onSingleHandler = (eventData) =>
+        {
+            Debug.Log("单击 " + eventData.pointerPressRaycast.gameObject.name);
+        };
+        UIExClickListener.Get(gameObject).onDoubleHandler = (eventData) =>
+        {
+            Debug.Log("双击 " + eventData.pointerPressRaycast.gameObject.name);
+        };
+    }
+
+
+
+}

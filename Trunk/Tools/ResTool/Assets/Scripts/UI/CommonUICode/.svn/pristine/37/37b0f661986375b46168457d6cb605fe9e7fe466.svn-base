@@ -1,0 +1,62 @@
+﻿using UnityEngine;
+using UnityEngine.EventSystems;
+using System;
+using UnityEngine.UI;
+#if !TOOL
+using XLua;
+
+[LuaCallCSharp]
+#endif
+public class TextWidget : UIBaseWidget
+{
+
+    public override WidgetType GetWidgetType()
+    {
+        return WidgetType.Text;
+    }
+
+    public Text Txt;
+
+    public override bool AddEventListener(UIEvent eventType, Action<PointerEventData> onEventHandler)
+    {
+        bool sign = true;
+        switch (eventType)
+        {
+            case UIEvent.PointerClick:
+                PointerClickListener.Get(gameObject).onHandler = onEventHandler;
+                break;
+            default:
+                sign = false;
+                break;
+        }
+        return sign;
+    }
+
+
+
+    public string text
+    {
+        get
+        {
+            return Txt.text;
+        }
+
+        set
+        {
+            Txt.text = value;
+        }
+    }
+
+    public Color color
+    {
+        get
+        {
+            return Txt.color;
+        }
+
+        set
+        {
+            Txt.color = value;
+        }
+    }
+}

@@ -1,0 +1,289 @@
+﻿using UnityEngine;
+using UnityEngine.UI;
+using System;
+using UnityEngine.EventSystems;
+#if !TOOL
+using XLua;
+
+[LuaCallCSharp]
+#endif
+public class ButtonWidget : UIBaseWidget
+{
+    [System.Serializable]
+    public struct StateParameter
+    {
+        public Vector2 size;
+        public Color texColor;
+    }
+    [SerializeField]
+    public bool pressStateSign;
+
+    [SerializeField]
+    public StateParameter normalStateParameter;
+    [SerializeField]
+    public StateParameter pressStateParameter;
+
+
+
+
+    public Button Btn;
+    public Text Txt;
+
+    Action<object> mcPlayEndAction;
+
+    public void SetExportSign(bool value)
+    {
+        exportSign = value;
+    }
+
+    public GameObject GetGameObject()
+    {
+        return gameObject;
+    }
+
+    public override WidgetType GetWidgetType()
+    {
+        return WidgetType.Button;
+    }
+
+
+    void Awake()
+    {
+
+        if (!Btn.interactable && pressStateSign)
+        {
+            Txt.color = pressStateParameter.texColor;
+        }
+
+        InitEvent();
+
+    }
+    void InitEvent()
+    {
+        PointerDownListener.Get(gameObject).onHandler = OnPointerDown;
+        PointerUpListener.Get(gameObject).onHandler = OnPointerUp;
+        PointerClickListener.Get(gameObject).onHandler = OnPointerClick;
+        PointerEnterListener.Get(gameObject).onHandler = OnPointerEnter;
+        PointerExitListener.Get(gameObject).onHandler = OnPointerExit;
+    }
+
+
+
+    public void SetInteractable(bool value)
+    {
+        Btn.interactable = value;
+        if (pressStateSign && Txt != null)
+        {
+            if (value)
+            {
+                Txt.color = normalStateParameter.texColor;
+            }
+            else
+            {
+                Txt.color = pressStateParameter.texColor;
+            }
+        }
+    }
+
+
+
+    public void SetPointerClickEffect(Action action)
+    {
+        pointerClickEffectFun = action;
+    }
+
+    Action pointerClickEffectFun = null;
+    Action<PointerEventData> pointerDownHandler;
+    Action<PointerEventData> pointerUpHandler;
+    Action<PointerEventData> pointerClickHandler;
+    Action<PointerEventData> pointerEnterHandler;
+    Action<PointerEventData> pointerExitHandler;
+    //Action<object> pointerEnterHandler;
+
+
+    public override bool AddEventListener(UIEvent eventType, Action<PointerEventData> onEventHandler)
+    {
+        bool sign = true;
+        switch (eventType)
+        {
+            case UIEvent.PointerDown:
+                pointerDownHandler = onEventHandler;
+                break;
+            case UIEvent.PointerUp:
+                pointerUpHandler = onEventHandler;
+                break;
+            case UIEvent.PointerClick:
+                pointerClickHandler = onEventHandler;
+                break;
+            case UIEvent.PointerEnter:
+                pointerEnterHandler = onEventHandler;
+                break;
+            case UIEvent.PointerExit:
+                pointerExitHandler = onEventHandler;
+                break;
+            default:
+                sign = false;
+                break;
+        }
+
+        return sign;
+    }
+
+    public override bool AddCustomEventListener(UICustomEvent eventType, Action<object> onEventHandler)
+    {
+        bool sign = true;
+        switch (eventType)
+        {
+            default:
+                sign = false;
+                break;
+        }
+        return sign;
+    }
+    void OnDestroy()
+    {
+        pointerDownHandler = null;
+        pointerUpHandler = null;
+        pointerClickHandler = null;
+        pointerEnterHandler = null;
+        pointerExitHandler = null;
+    }
+
+
+    void OnPointerDown(PointerEventData eventData)
+    {
+        if (!Btn.IsInteractable()) return;
+        if (pressStateSign)
+        {
+            if (Txt != null)
+            {
+                Txt.color = pressStateParameter.texColor;
+            }
+            ((RectTransform)transform).sizeDelta = pressStateParameter.size;
+        }
+        if (pointerDownHandler != null)
+        {
+            pointerDownHandler.Invoke(eventData);
+        }
+    }
+
+
+    void OnPointerUp(PointerEventData eventData)
+    {
+        if (!Btn.IsInteractable()) return;
+        if (pressStateSign)
+        {
+            if (Txt != null)
+            {
+                if (Btn.interactable)
+                {
+                    Txt.color = normalStateParameter.texColor;
+                }
+                else
+                {
+                    Txt.color = pressStateParameter.texColor;
+                }
+
+            }
+            ((RectTransform)transform).sizeDelta = normalStateParameter.size;
+        }
+        if (pointerUpHandler != null)
+        {
+            pointerUpHandler.Invoke(eventData);
+        }
+    }
+
+
+    void OnPointerClick(PointerEventData eventData)
+    {
+        if (!Btn.IsInteractable()) return;
+        if (!canClickSign)
+        {
+            IntervalWarn();
+            return;
+        }
+        if (pointerClickHandler != null)
+        {
+            pointerClickHandler(eventData);
+        }
+
+
+        if (!string.IsNullOrEmpty(clickWarn))
+        {
+
+#if TOOL
+#else
+            GlobalTimeManager.Instance.timerController.AddTimer(this, clickIntervalTime, 1, (i) => { canClickSign = true; });
+#endif
+        }
+
+        if (pointerClickEffectFun != null)
+        {
+            pointerClickEffectFun.Invoke();
+        }
+
+    }
+
+    void OnPointerEnter(PointerEventData eventData)
+    {
+        if (!Btn.IsInteractable()) return;
+        if (pointerEnterHandler != null)
+        {
+            pointerEnterHandler(eventData);
+        }
+
+    }
+
+    void OnPointerExit(PointerEventData eventData)
+    {
+        if (!Btn.IsInteractable()) return;
+        if (pointerExitHandler != null)
+        {
+            pointerExitHandler(eventData);
+        }
+
+    } 
+
+    public bool SetCanClickSign()
+    {
+        if (!string.IsNullOrEmpty(clickWarn))
+        {
+            canClickSign = false;
+            return true;
+        }
+        return false;
+    }
+
+    bool canClickSign = true;
+
+    public bool CanClickSign
+    {
+        get { return canClickSign; }
+    }
+    uint clickIntervalTime;
+    string clickWarn = null;
+
+    public void SetInterval(string warnStr, uint intervalTime = 1000)
+    {
+        clickWarn = warnStr;
+        clickIntervalTime = Math.Max(50, intervalTime);
+    }
+    public void ClearInterval()
+    {
+        clickIntervalTime = 50;
+        canClickSign = true;
+        clickWarn = null;
+    }
+    void IntervalWarn()
+    {
+        if (!string.IsNullOrEmpty(clickWarn))
+        {
+#if TOOL
+#else
+            //OperationFeedbackTips.Popup(clickWarn);
+#endif
+        }
+    }
+
+
+}

@@ -1,0 +1,27 @@
+TableBaseSetHelpList = {data = {}}
+
+TableBaseSetHelpList.m_isInit = false
+
+function TableBaseSetHelpList.init()
+	if TableBaseSetHelpList.m_isInit then
+		return
+	else
+		TableBaseSetHelpList.data[1] = { id = 1, type = 1, ishot = 0, title = "如何更改头像、昵称与其他个人信息", answer = "1.在好友、红包或游戏界面，点击左上角的头像图片，可进入个人信息修改页面\n2.在个人信息修改页面，点击相应项目，即可进入修改相应的信息\n3.性别信息项目中，每个账号只能修改一次"}
+		TableBaseSetHelpList.data[2] = { id = 2, type = 2, ishot = 1, title = "如何获得现金红包", answer = "1.在活动界面中领取商家或官方红包\n2.在活动界面中参与商家或官方赛事，可赢取赛事中的现金红包\n3.在红包界面领取在线红包，或从好友处抢红包"}
+		TableBaseSetHelpList.data[3] = { id = 3, type = 3, ishot = 1, title = "如何查看某个区域的活动", answer = "1.在活动界面中，可拖动或缩放地图查看其他区域\n2.点击活动界面右上方的“搜一搜此区域”，即可查看当前地图区域的活动\n3.点击“搜一搜此区域”旁的按钮，可筛选查看不同类型的活动"}
+		TableBaseSetHelpList.data[4] = { id = 4, type = 2, ishot = 1, title = "如何获得在线红包", answer = "1.在红包界面左上方，显示您的在线红包的可领取倒计时\n2.倒计时完结后，可点击该按钮领取在线红包\n3.领取后分享到微信，可使得该次在线红包奖励翻倍（每天有次数上限）"}
+		TableBaseSetHelpList.data[5] = { id = 5, type = 3, ishot = 0, title = "如何参与赛事", answer = "1.在活动地图上点击赛事图标，可进入相应的商家赛事或官方赛事\n2.在官方赛事中，点击马上参赛，即可立刻进入该赛事的游戏进行比赛\n3.在商家赛事中，如界面上开赛显示倒计时，则倒计时完结后才可进入赛事；如界面上显示活动结束倒计时，则可点击“进入游戏”立刻进入赛事游戏"}
+		TableBaseSetHelpList.data[6] = { id = 6, type = 2, ishot = 1, title = "如何抢好友红包", answer = "1.在红包界面中，可看到好友的红包\n2.如好友的红包显示倒计时，表示该好友的红包正处于倒计时状态，倒计时完结后可立刻抢TA的红包\n3.如好友红包显示“点击领取”则可点击该按钮，直接抢TA的红包"}
+		TableBaseSetHelpList.data[7] = { id = 7, type = 2, ishot = 0, title = "为什么我看不到其他好友的红包了", answer = "1.好友的红包都被抢光了\n2.好友的红包当天都领完了\n3.当前没有好友\n\n提示：添加更多好友，能看到并抢到更多好友的红包哦"}
+		TableBaseSetHelpList.data[8] = { id = 8, type = 4, ishot = 1, title = "如何进行提现", answer = "1.在红包界面，点击右上方的“提现”按钮，可进入提现\n2.提现时可选择提现1元或30元，其中提现30元需要当前现金余额大于50元且好友数量大于30\n3.每24小时只能提现1次\n4.当前提现只支持支付宝"}
+		TableBaseSetHelpList.data[9] = { id = 9, type = 3, ishot = 0, title = "为什么我参与赛事后没有获得奖励", answer = "1.赛事参赛时间结束，且所有参赛玩家都结束比赛后，才会结算排名并发放奖励\n2.结算排名后，可在消息界面中查看自己的最终排名，如进入了奖励名次，则可领取奖励"}
+		TableBaseSetHelpList.data[10] = { id = 10, type = 3, ishot = 0, title = "如何在开赛前标记我感兴趣的商家赛", answer = "1.在商家赛事未开赛时，在赛事界面中可勾选“活动开始时在地图上提醒我”对该赛事进行标记\n2.被标记的赛事在活动地图上会显示提示箭头；也可点击活动界面右上角的“关注赛事”按钮查看被标记的赛事"}
+		TableBaseSetHelpList.data[11] = { id = 11, type = 4, ishot = 0, title = "金币不够了，如何获取更多金币", answer = "1.在红包或游戏界面上方，点击金币显示区域，可进入金币购买界面\n2.在线红包或抢好友红包时，有几率获得金币\n3.参与官方赛事，可赢取大量金币"}
+		TableBaseSetHelpList.m_isInit = true
+	end
+end
+
+function TableBaseSetHelpList.clear()
+	TableBaseSetHelpList.m_isInit = false
+	TableBaseSetHelpList.data = {}
+end

@@ -1,0 +1,22 @@
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.UI;
+
+public class UIExEventTest : MonoBehaviour
+{
+    public ScrollPageWidget hour_scroll_panel;
+    public ScrollPageWidget minute_scroll_panel;
+
+    void Start()
+    {
+        UIExClickListener.Get(gameObject).onSingleHandler = (evenData) => { Debug.Log("单击"); };
+        UIExClickListener.Get(gameObject).onDoubleHandler = (evenData) => { Debug.Log("双击"); };
+        UIExLongClickListener.Get(gameObject).onHandler= (evenData) => { Debug.Log("长按"); };
+
+    }
+
+
+}

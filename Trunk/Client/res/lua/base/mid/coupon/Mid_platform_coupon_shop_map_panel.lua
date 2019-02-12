@@ -1,0 +1,32 @@
+﻿local TextWidget=CS.TextWidget
+local ButtonWidget=CS.ButtonWidget
+local EmptyImageWidget=CS.EmptyImageWidget
+
+Mid_platform_coupon_shop_map_panel={}
+local this = Mid_platform_coupon_shop_map_panel
+
+function this:new(gameObject)
+	local o = { }
+	setmetatable(o, self)
+	self.__index = self
+	o:init(gameObject)
+	return o
+end
+
+this.go = nil
+this.shop_name_Text=nil
+this.shop_add_Text=nil
+this.shop_tel_Text=nil
+this.navi_Button=nil
+this.back_Image=nil
+
+function this:init(gameObject)
+	self.go=gameObject
+	self.shop_name_Text=self.go.transform:Find("shop_name_Text"):GetComponent(typeof(TextWidget))
+	self.shop_add_Text=self.go.transform:Find("shop_add_Text"):GetComponent(typeof(TextWidget))
+	self.shop_tel_Text=self.go.transform:Find("shop_tel_Text"):GetComponent(typeof(TextWidget))
+	self.navi_Button=self.go.transform:Find("navi_Button"):GetComponent(typeof(ButtonWidget))
+	self.back_Image=self.go.transform:Find("back_Image_Bg/back_Image/back_Image"):GetComponent(typeof(EmptyImageWidget))
+end
+
+

@@ -1,0 +1,3 @@
+GlobalOnceData = {}
+
+GlobalOnceData.hasLoginRecord = false

@@ -1,0 +1,81 @@
+﻿using UnityEngine;
+using UnityEngine.EventSystems;
+using System;
+using UnityEngine.UI;
+#if !TOOL
+using XLua;
+
+[LuaCallCSharp]
+#endif
+public class TextWidget : UIBaseWidget
+{
+
+    public override WidgetType GetWidgetType()
+    {
+        return WidgetType.Text;
+    }
+
+    public Text Txt;
+
+    public override bool AddEventListener(UIEvent eventType, Action<PointerEventData> onEventHandler)
+    {
+        bool sign = true;
+        switch (eventType)
+        {
+            case UIEvent.PointerClick:
+                PointerClickListener.Get(gameObject).onHandler = onEventHandler;
+                break;
+            default:
+                sign = false;
+                break;
+        }
+        return sign;
+    }
+    public override bool RemoveEventListener(UIEvent eventType, System.Action<PointerEventData> onEventHandler) {
+        bool sign = true;
+        switch (eventType) {
+            case UIEvent.PointerClick:
+                PointerClickListener.Get(gameObject).onHandler = null;
+                break;
+            default:
+                sign = false;
+                break;
+        }
+        return sign;
+    }
+
+    public void SetFarAway(bool isFar)
+    {
+        BaseSetFarAway(isFar);
+    }
+    public bool IsFarAway
+    {
+        get { return IsBaeFarAway; }
+    }
+
+    public string text
+    {
+        get
+        {
+            return Txt.text;
+        }
+
+        set
+        {
+            Txt.text = value;
+        }
+    }
+
+    public Color color
+    {
+        get
+        {
+            return Txt.color;
+        }
+
+        set
+        {
+            Txt.color = value;
+        }
+    }
+}

@@ -1,0 +1,104 @@
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.EventSystems;
+public class UIExClickListener : UIBehaviour, IPointerClickHandler, IPointerDownHandler, IPointerUpHandler
+{
+    [Tooltip("双击界定时间")]
+    public const float shortDefinition = 0.2f;
+    public static UIExClickListener Get(GameObject go)
+    {
+        UIExClickListener listener = go.GetComponent<UIExClickListener>();
+        if (listener == null) listener = go.AddComponent<UIExClickListener>();
+        return listener;
+    }
+
+
+    public Action<PointerEventData> onSingleHandler;
+    public Action<PointerEventData> onDoubleHandler;
+
+    private UIExLongClickListener longListener;
+    private PointerEventData m_eventData;
+
+    private bool m_isDragging = false;
+    public bool isDragging
+    {
+        get { return m_isDragging; }
+        set { m_isDragging = value; }
+    }
+
+    void Update()
+    {
+        if (downTimeQueue.Count > 0)
+        {
+            var lastTime = downTimeQueue.Peek();
+            var curTime = Time.unscaledTime;
+            var deltaTime = curTime - lastTime;
+            //Debug.Log("deltaTime = " + deltaTime);
+            if (deltaTime >= shortDefinition && !isDouble)
+            {
+                //Debug.LogFormat("单击, isLongPressed = {0}, m_isDragging = {1}", isLongPressed(), m_isDragging);
+                downTimeQueue.Clear();
+                if (isLongPressed() == false && !m_isDragging)
+                {
+                    if (onSingleHandler != null && m_eventData != null)
+                    {
+                        onSingleHandler.Invoke(m_eventData);
+                        m_eventData = null;
+                    }
+                }
+            }
+            else if (isDouble)
+                downTimeQueue.Clear();
+
+        }
+
+    }
+
+    /// <summary>
+    /// 无论是单击还是双击, 都要排除可能由于点下和弹起的时间间隔过长触发长按事件, 以及拖动事件
+    /// </summary>
+    /// <returns></returns>
+    private bool isLongPressed()
+    {
+        if (longListener == null)
+            longListener = GetComponent<UIExLongClickListener>();
+        if (longListener == null)
+            return false;
+        return longListener.IsLongPressTriggered;
+    }
+
+    private bool isDouble = false;
+
+    float lastTimeClick;
+    public void OnPointerClick(PointerEventData eventData)
+    {
+        float currentTimeClick = eventData.clickTime;
+        if ((currentTimeClick - lastTimeClick) < 0.3f)
+        {
+            isDouble = true;
+            //Debug.LogFormat("双击, isLongPressed = {0}, m_isDragging = {1}", isLongPressed(), m_isDragging);
+            if (!isLongPressed() && !m_isDragging)
+                if (onDoubleHandler != null) onDoubleHandler.Invoke(eventData);
+        }
+        lastTimeClick = currentTimeClick;
+        m_eventData = eventData;
+    }
+    private Queue<float> downTimeQueue = new Queue<float>();
+    public void OnPointerDown(PointerEventData eventData)
+    {
+        //Debug.Log(string.Format("点击按下. {0} {1}", gameObject.name, eventData.pointerPressRaycast.gameObject.name));
+        if (downTimeQueue.Count < 2)
+        {
+            var time = Time.unscaledTime;
+            downTimeQueue.Enqueue(time);
+        }
+        isDouble = false;
+    }
+
+    public void OnPointerUp(PointerEventData eventData)
+    {
+
+    }
+}

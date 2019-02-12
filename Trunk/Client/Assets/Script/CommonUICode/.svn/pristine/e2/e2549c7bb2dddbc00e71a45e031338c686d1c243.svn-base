@@ -1,0 +1,356 @@
+﻿using System;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.UI;
+#if !TOOL
+using XLua;
+
+[LuaCallCSharp]
+#endif
+public class MarqueeWidget : UIBaseWidget
+{
+    public enum InsertStyle
+    {
+        Head,
+        Tail
+    }
+
+    enum PlayState
+    {
+        Begin,
+        Move,
+        End
+    }
+    PlayState curPlayState = PlayState.Begin;
+
+    public InsertStyle curInsertStyle = InsertStyle.Tail;
+
+    public override WidgetType GetWidgetType()
+    {
+        return WidgetType.Marquee;
+    }
+
+    /// <summary>
+    /// 固定三个文本
+    /// </summary>
+    public Text[] txtArr = new Text[3];
+
+    /// <summary>
+    /// 一个空的移动容器
+    /// </summary>
+    public RectTransform moveContainer;
+
+    float containerPos = 0f;
+
+    public RectTransform mask;
+    public Image maskImg;
+    float maskWidth = 0f;
+
+    /// <summary>
+    /// 每帧多少毫秒;
+    /// </summary>
+    int timePerFrame;
+
+    /// <summary>
+    /// 移动速度 每秒移多少像素
+    /// </summary>
+    private int speed = 10;
+
+    /// <summary>
+    /// 换成每帧多少像素
+    /// </summary>
+    float frame_speed;
+    public int Speed
+    {
+        get
+        {
+            return speed;
+        }
+
+        set
+        {
+            speed = value;
+            ConvertFrameSpeed();
+        }
+    }
+
+    void ConvertFrameSpeed()
+    {
+        timePerFrame = Mathf.RoundToInt(1000f / (float)Application.targetFrameRate);
+        frame_speed = (float)Math.Round((float)speed / (float)Application.targetFrameRate, 2);
+        //Debug.LogError("speed    "+ speed);
+        //Debug.LogError("Application.targetFrameRate " + Application.targetFrameRate);
+        //Debug.LogError("frame_speed  "+ frame_speed);
+    }
+
+    bool initSign = false;
+    void Awake()
+    {
+#if !TOOL
+        //speed = 30;
+        //beginFreeze_MS = 2000;
+        //endFreeze_MS = 2000;
+        ConvertFrameSpeed();
+        if (!initSign)
+        {
+            Reset();
+        }
+#endif
+    }
+
+
+    public bool isLoop = false;
+
+    public bool showMaskSign = false;
+
+
+    public int beginFreeze_MS = 0;
+    int runBeginFreeze_MS = 0;
+
+    public int endFreeze_MS = 0;
+    int runEndFreeze_MS = 0;
+
+    /// <summary>
+    /// 文本之间的间隔
+    /// </summary>
+    public float space = 0f;
+
+
+
+    bool playing = false;
+    public override bool AddEventListener(UIEvent eventType, Action<PointerEventData> onEventHandler)
+    {
+        bool sign = true;
+        //switch (eventType)
+        //{
+        //    case UIEvent.PointerClick:
+        //        PointerClickListener.Get(gameObject).onHandler = onEventHandler;
+        //        break;
+        //    default:
+        //        sign = false;
+        //        break;
+        //}
+        return sign;
+    }
+    public override bool RemoveEventListener(UIEvent eventType, System.Action<PointerEventData> onEventHandler) {
+        bool sign = true;
+        return sign;
+    }
+    public void Reset()
+    {
+#if !TOOL
+        InitPool();
+        moveContainer.anchoredPosition = Vector2.zero;
+        containerPos = 0f;
+        curPlayState = PlayState.Begin;
+        runBeginFreeze_MS = 0;
+        runEndFreeze_MS = 0;
+        runQueue.Clear();
+        maskWidth = mask.sizeDelta.x;
+        lastTxt = null;
+#endif
+
+    }
+
+    Queue<Text> pool = new Queue<Text>();
+
+
+    void InitPool()
+    {
+        pool.Clear();
+        for (int i = 0; i < txtArr.Length; i++)
+        {
+            Text t = txtArr[i];
+            if (t != null)
+            {
+                pool.Enqueue(t);
+                //t.enabled = false;
+                t.text = "";
+            }
+        }
+    }
+
+    string beginItem;
+    Queue<string> contentQueue = new Queue<string>();
+
+    Queue<string> loopContentQueue = new Queue<string>();
+
+    Queue<Text> runQueue = new Queue<Text>();
+    Queue<Text> waitRecycleQueue = new Queue<Text>();
+    public void Append(string content, bool autoPlay = false)
+    {
+        if (isLoop && contentQueue.Count == 0 && runQueue.Count == 0)
+        {
+            //记录下第一个字符串
+            beginItem = content;
+        }
+        contentQueue.Enqueue(content);
+        if (autoPlay && !playing)
+        {
+            Reset();
+            Play();
+        }
+    }
+
+
+
+    public void Play()
+    {
+        playing = true;
+#if !TOOL
+        GlobalTimeManager.Instance.timerController.AddTimer(this, -1, -1, RunFun);
+#endif
+    }
+
+    public void Pause()
+    {
+        playing = false;
+#if !TOOL
+        GlobalTimeManager.Instance.timerController.RemoveTimerByKey(this);
+#endif
+    }
+
+    void RunFun(int n)
+    {
+        SetMarquee();
+        switch (curPlayState)
+        {
+            case PlayState.Begin:
+                if (runBeginFreeze_MS >= beginFreeze_MS)
+                {
+                    runBeginFreeze_MS = 0;
+                    curPlayState = PlayState.Move;
+                }
+                else
+                {
+#if !TOOL
+                    runBeginFreeze_MS += GlobalTimeManager.Instance.timerController.lastDeltaTime;
+#endif
+                }
+                break;
+            case PlayState.Move:
+                bool sign = MoveMarquee();
+                if (sign)
+                {
+                    //Debug.LogError("containerPos " + containerPos);
+                    moveContainer.anchoredPosition = new Vector2(containerPos, 0);
+                }
+                else
+                {
+                    curPlayState = PlayState.End;
+                }
+                break;
+            case PlayState.End:
+                if (runEndFreeze_MS >= endFreeze_MS)
+                {
+                    //检测回收
+                    CheckRecycle();
+
+                    if (isLoop)
+                    {
+                        while (loopContentQueue.Count > 0)
+                        {
+                            contentQueue.Enqueue(loopContentQueue.Dequeue());
+                        }
+                        Reset();
+                        curPlayState = PlayState.Begin;
+                    }
+                }
+                else
+                {
+#if !TOOL
+                    //Debug.LogError(runEndFreeze_MS + " 等待结束========"+ endFreeze_MS);
+                    runEndFreeze_MS += GlobalTimeManager.Instance.timerController.lastDeltaTime;
+#endif
+                }
+                break;
+        }
+
+    }
+
+    void SetMarquee()
+    {
+        if (contentQueue.Count > 0 && pool.Count > 0)
+        {
+            Text t = pool.Dequeue();
+            runQueue.Enqueue(t);
+            string str = contentQueue.Dequeue();
+            t.text = str;
+
+            //if (isLoop)
+            //{
+            //    contentQueue.Enqueue(str);
+            //}
+            if (lastTxt == null)
+            {
+                if (curInsertStyle == InsertStyle.Head)
+                {
+                    t.rectTransform.anchoredPosition = new Vector2(0, 0);
+                }
+                else
+                {
+                    t.rectTransform.anchoredPosition = new Vector2(mask.anchoredPosition.x, 0);
+                }
+            }
+            else
+            {
+                //Debug.LogError("lastTxt.rectTransform.anchoredPosition.x+ lastTxt.preferredWidth  " + lastTxt.rectTransform.anchoredPosition.x + lastTxt.preferredWidth);
+                //Debug.LogError("containerPos + maskWidth "+ containerPos + maskWidth);
+                float lastPos = Mathf.Max(lastTxt.rectTransform.anchoredPosition.x + lastTxt.preferredWidth, containerPos + maskWidth);
+
+                t.rectTransform.anchoredPosition = new Vector2(lastPos + space, 0);
+            }
+            //t.enabled = true;
+            lastTxt = t;
+        }
+    }
+
+
+    Text lastTxt = null;
+    bool MoveMarquee()
+    {
+        if (runQueue.Count > 0)
+        {
+            Text frontTxt = runQueue.Peek();
+
+            float value;
+            if (curInsertStyle == InsertStyle.Head)
+            {
+                value = frontTxt.rectTransform.anchoredPosition.x + frontTxt.preferredWidth + containerPos - maskWidth;
+            }
+            else
+            {
+                value = frontTxt.rectTransform.anchoredPosition.x + frontTxt.preferredWidth + containerPos;
+            }
+            if (value < 0f)
+            {
+                //Debug.LogError("等回收======================》》》》》》》》》》》》》");
+                waitRecycleQueue.Enqueue(runQueue.Dequeue());
+                return false;
+            }
+            else
+            {
+                containerPos -= frame_speed;
+                return true;
+            }
+        }
+        else
+        {
+            //containerPos += frame_speed;
+            return false;
+        }
+    }
+    void CheckRecycle()
+    {
+        while (waitRecycleQueue.Count > 0)
+        {
+            //Debug.LogError("=====回收========");
+            Text frontTxt = waitRecycleQueue.Dequeue();
+            loopContentQueue.Enqueue(frontTxt.text);
+            frontTxt.text = "";
+            //frontTxt.enabled = false;
+            pool.Enqueue(frontTxt);
+        }
+    }
+}

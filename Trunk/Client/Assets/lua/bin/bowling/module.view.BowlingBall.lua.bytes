@@ -1,0 +1,222 @@
+require "bowling:module/data/BowlingModelManager"
+require "bowling:module/data/BowlingTag"
+require "bowling:module/data/BowlingEZReplayManager"
+
+BowlingBall = {}
+local this = BowlingBall
+
+this.pitRegion={}--��������ײ��������
+this.count=false--��������ײ��������,��ʼ����ʱ��
+BowlingBall.playerBallName ="playerBall" --���ҵı�����
+BowlingBall.isGameStop=false
+
+
+--��ʼ��������
+function BowlingBall.init()
+	this.addNotice()
+end
+function this.addNotice()
+	NoticeManager.Instance:AddNoticeLister(BowlingEvent.exitGame,this.dispose)
+	NoticeManager.Instance:AddNoticeLister(BowlingEvent.endRoundReset,this.endRoundRest)
+end
+function this.removeNotice()
+	NoticeManager.Instance:RemoveNoticeLister(BowlingEvent.endRoundReset,this.endRoundRest)
+	NoticeManager.Instance:RemoveNoticeLister(BowlingEvent.exitGame,this.dispose)
+end
+
+function this.endRoundRest()
+		this.pitRegion.stayTime=0
+		this.isCount=false
+		BowlingBall.m_fired =false --�Ƿ�����
+		this.addHoriForce=Vector3.zero
+		printDebug("<color='red'>BowlingBall this.endRoundRest() this.isCount=false </color>")
+end
+function BowlingBall.initBall(obj)
+		BowlingBall.target = obj
+		BowlingBall.target.name = BowlingBall.playerBallName
+		BowlingBall.target.gameObject.layer=BowlingPlayerController.ballLayer
+		BowlingBall.name =BowlingScene.playerBallName
+		BowlingBall.index =1 
+		BowlingBall.m_rigidBody =obj:GetComponent(typeof(Rigidbody))
+		BowlingBall.m_rigidBody.mass = 6
+		BowlingBall.angVel =Vector3(60,0,0) -- ���˶�����ת
+		BowlingBall.m_initalPos =BowlingBall.target.transform.position
+		BowlingBall.m_prevLocs =Vector3.zero -- ��������λ��
+		BowlingBall.m_initalRot =BowlingBall.target.transform.rotation
+		BowlingBall.m_screenPoint =Vector3.zero -- ��������Ļλ��
+		BowlingBall.gutterPositions =Vector2(-0.65,0.65) --���Ⱥ�������λ��
+		BowlingBall.m_fired =false --�Ƿ�����
+		BowlingBall.m_mouseDown =false --�Ƿ�����
+		BowlingBall.m_offset =Vector3.zero --�Ƿ�����
+		BowlingEZReplayManager.mark4Recording(obj)
+		
+		BowlingBall.m_dragThreshold =60 --�ж���Ϊˮƽ�ƶ�
+		BowlingBall.m_dragLimitX =0.4 --��ˮƽλ����������xλ�õ�
+		BowlingBall.pointerGO =BowlingBall.target.transform:Find("pointer").gameObject
+		BowlingBall.pointerGO.transform.eulerAngles = Vector3.zero
+		BowlingBall.forceMode =1 --Force = 0,Impulse = 1,VelocityChange = 2,Acceleration = 5
+			
+		BowlingBall.Update=function()
+			--printDebug("BowlingBall update() time=".. Time.time)
+			if not BowlingBall.m_fired then
+		
+				return
+			end
+			if  BowlingBall.target.transform.position.y<-40 then
+				printDebug("-- �������߽�---")
+					BowlingGameManager.RestGame() -- �������߽�
+			end
+			--��ʼ¼�ƻط�
+			if BowlingBall.target.transform.position.z>16 then
+				BowlingEZReplayManager.record()
+				this.addHoriForceTime = this.addHoriForceFrameTime --��������ת��
+				--printDebug("-- BowlingBall.target.transform.position.z>16---")
+			end
+			
+			--����������
+		--[[	if BowlingBall.target.transform.position.z>5 then
+					---������ת��
+				if this.addHoriForce==Vector3.zero then
+					return
+				end
+				this.addHoriForceTime = this.addHoriForceTime-Time.deltaTime
+				--printDebug("-- BowlingBall.target.transform.position.z>5---this.addHoriForce="..tostring(this.addHoriForce))
+				if this.addHoriForceTime<0 then
+					this.addHoriForceTime =this.addHoriForceFrameTime
+					BowlingBall.m_rigidBody:AddForce(this.addHoriForce)
+					--printDebug("BowlingBall.m_rigidBody:AddForce(this.addHoriForce)="..tostring(this.addHoriForce))
+				end
+			end--]]
+
+		end
+
+		BowlingBall.fireBall=function(vec)
+--[[			printDebug("@@@@BowlingBall.fireBall() vec="..tostring(vec))
+			printDebug("@@@@BowlingBall.fireBall() BowlingBall="..table.tostring(BowlingBall))--]]
+			if BowlingBall.m_rigidBody and Time.timeScale~=0 then
+			
+				if BowlingBall.pointerGO then
+					BowlingBall.pointerGO:SetActive(false)
+				end
+				BowlingBall.m_fired =true
+				BowlingBall.m_rigidBody.isKinematic=false
+				this.isCount=true
+				--local addforceVec =BowlingBall.target.transform.rotation * vec --ԭ������
+				local addforceVec =vec
+				
+				--printDebug("@@@@BowlingBall.fireBall() AddForce="..tostring(addforceVec))
+				--BowlingBall.m_rigidBody:AddForce(Vector3(2.2, 0, 3244.1))
+				BowlingBall.m_rigidBody:AddForce(addforceVec)
+				--  ���˶��ٶ� forceVec.z= 1600~6000  ��ת�Ƕ� 6~60
+				BowlingBall.m_rigidBody.angularVelocity=Vector3(addforceVec.z,0,0)/79
+				--printDebug("<color='blue'>BowlingBall.setMoveRotate() BowlingBall.m_rigidBody.angularVelocity=="..tostring(BowlingBall.m_rigidBody.angularVelocity).."</color>")
+				BowlingGameManager.fireBall()
+				AudioManager.playSound("bowling", "bowling_fire")	
+			end
+
+		end
+		
+		this.addHoriForce=Vector3.zero --����������
+		this.addHoriForceFrameTime =0.2
+		this.addHoriForceTime =this.addHoriForceFrameTime
+		BowlingBall.addHoriBall=function(vec,power)
+			printDebug("<color='blue'>addHoriBall()  vec="..tostring(vec).."</color>")
+			printDebug("<color='blue'>addHoriBall()  power="..tostring(power).."</color>")
+			--BowlingBall.m_rigidBody:AddForce(vec)
+			this.addHoriForce = vec
+		end
+
+
+		BowlingBall.OnCollisionEnter=function(collision)
+			if collision.gameObject.name== BowlingTag.Gutter then
+				BowlingGameManager.gutterBall()
+				this.ballInGutter()
+				local pos = BowlingBall.target.transform.position
+				if pos.x>0 then
+					--pos.x =  BowlingBall.gutterPositions.y
+				end
+				if pos.x<0 then
+					---pos.x =  BowlingBall.gutterPositions.x
+				end
+				--BowlingBall.m_startGutterXPos.x
+				 BowlingBall.target.transform.position = pos
+				--BowlingEZReplayManager.stop()
+			--	printDebug("@@@@ ��ײ���ñ�����λ�� BowlingBall.target.transform.position"..tostring(BowlingBall.target.transform.position))
+			end
+		end
+		BowlingBall.OnCollisionExit=function(collision)
+			
+		end
+		BowlingBall.OnCollisionStay=function(collision)
+			if collision.gameObject.name== BowlingTag.Gutter then -- ���빵��
+				this.ballInGutter()
+			end
+		end
+		---������������������
+		this.pitRegion.OnTriggerStay=function(collision)
+			if this.isCount==false then
+				return
+			end
+			if collision.gameObject.name==BowlingBall.playerBallName and this.isCount then
+				this.pitRegion.stayTime=this.pitRegion.stayTime+Time.deltaTime
+				if this.pitRegion.stayTime>3 then--Ͷ��һ�غϽ���
+				--	printDebug("======= this.pitRegion.OnTriggerStay  NoticeManager.Instance:Dispatch(BowlingEvent.endRoundReset)======")
+					NoticeManager.Instance:Dispatch(BowlingEvent.endRoundReset)
+
+				end
+			end
+		end
+
+		PhysicGameManager.Instance:addUpdateFun(BowlingBall.Update)
+		PhysicGameManager.Instance:addPhysic(BowlingBall.target.gameObject,BowlingBall.OnCollisionEnter,BowlingBall.OnCollisionExit,BowlingBall.OnCollisionStay)
+		PhysicGameManager.Instance:addPhysicTrigger(this.pitRegion.target.gameObject,nil,this.pitRegion.OnTriggerStay)
+		
+end
+function this.ballInGutter()
+	--BowlingBall.m_rigidBody.angularVelocity = Vector3.zero
+	local vel= BowlingBall.m_rigidBody.velocity
+	--vel.y=0
+	BowlingBall.m_rigidBody.velocity = vel
+	this.addHoriForce=Vector3.zero
+end
+function BowlingBall.initPitRegion(obj)
+	this.pitRegion.stayTime=0
+	this.pitRegion.target = obj
+	
+end
+function BowlingBall.Update()
+
+
+end
+
+function BowlingBall.reset(resultScore)
+		BowlingBall.target.transform.position = BowlingBall.m_initalPos
+		BowlingBall.target.transform.rotation = BowlingBall.m_initalRot
+		BowlingBall.m_prevLocs =Vector3.zero -- ��������λ��
+		BowlingBall.m_screenPoint =Vector3.zero -- ��������Ļλ��
+		BowlingBall.m_fired =false --�Ƿ�����
+		BowlingBall.m_mouseDown =false --�Ƿ�����
+		BowlingBall.m_offset =Vector3.zero --�Ƿ�����
+		BowlingBall.m_rigidBody.isKinematic=true
+		BowlingBall.pointerGO.transform.eulerAngles = Vector3.zero
+		BowlingBall.pointerGO:SetActive(true)
+		BowlingFollowCamera.restCameraSpeed(resultScore)
+end
+
+function BowlingBall.getBallScreenPos()
+	local screenPoint = BowlingScene.MainCamera:WorldToScreenPoint(BowlingBall.target.transform.position)
+	return screenPoint
+end
+
+
+function BowlingBall.getBallScreenPosToWorldPos(screenPos)
+		if BowlingBall.m_screenPoint ==Vector3.zero then
+			BowlingScene.playerBowling.m_screenPoint =BowlingBall.getBallScreenPos()
+		end
+		local worldPos= BowlingScene.MainCamera:ScreenToWorldPoint(Vector3(screenPos.x, screenPos.y, BowlingScene.playerBowling.m_screenPoint.z))
+		return worldPos
+end
+
+function BowlingBall.dispose()
+	this.removeNotice()
+end

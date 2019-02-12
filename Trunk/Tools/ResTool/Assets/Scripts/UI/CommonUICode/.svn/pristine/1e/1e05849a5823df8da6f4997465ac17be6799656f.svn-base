@@ -1,0 +1,250 @@
+﻿using UnityEngine;
+using System.Collections.Generic;
+using System;
+#if !TOOL
+using XLua;
+
+[LuaCallCSharp]
+#endif
+public class CellRecycleNewScrollWidget : ScrollPanelWidget
+{
+    public override WidgetType GetWidgetType()
+    {
+        return WidgetType.CellRecycleNewScroll;
+    }
+
+    [SerializeField]
+    private CellItemWidget m_cellBase;
+    private LinkedList<CellItemWidget> cells = new LinkedList<CellItemWidget>();
+
+    //visibleRect范围内的cell才显示
+    private Rect visibleRect;
+    [SerializeField]
+    private RectOffset visibleRectPadding;
+
+    [SerializeField]
+    private RectOffset padding;
+    [SerializeField]
+    private float spacingHeight = 4f;
+
+    List<object> dataList = new List<object>();
+    Action<GameObject, object, int> onUpdateCellData;
+
+    public void SetCellBase(GameObject cellBaseGO, GameObject contentGO)
+    {
+        m_cellBase = cellBaseGO.GetComponent<CellItemWidget>();
+        UITools.SetParentAndAlign(cellBaseGO, contentGO);
+    }
+    
+    private void UpdateVisibleRect()
+    {
+        visibleRect.x = scrollRect.content.anchoredPosition.x - visibleRectPadding.left;
+        visibleRect.y = -scrollRect.content.anchoredPosition.y + visibleRectPadding.top;
+        visibleRect.width = scrollRT.rect.width + visibleRectPadding.left + visibleRectPadding.right;
+        visibleRect.height = scrollRT.rect.height + visibleRectPadding.top + visibleRectPadding.bottom;
+    }
+
+    private Vector2 prevScrollPos;
+
+    protected override void OnValueChanged(Vector2 v2)
+    {
+        base.OnValueChanged(v2);
+
+        //更新visibleRect
+        UpdateVisibleRect();
+
+        ReuseCells((v2.y < prevScrollPos.y) ? 1 : -1);
+
+        prevScrollPos = v2;
+    }
+
+    private void ReuseCells (int scrollDirection)
+    {
+        if (cells.Count < 1)
+            return;
+
+        if (scrollDirection > 0)
+        {
+            CellItemWidget firstCell = cells.First.Value;
+            //Logger.PrintWarning("cell_" + firstCell.index + "_Top:" + firstCell.Top);
+            //Logger.PrintWarning("cell_" + firstCell.index + "_Bottom:" + firstCell.Bottom);
+            //Logger.PrintWarning("visibleRect.y:" + visibleRect.y);
+            //Logger.PrintWarning("visibleRect.height:" + visibleRect.height);
+            while (firstCell.Bottom.y > visibleRect.y)
+            {
+                CellItemWidget lastCell = cells.Last.Value;
+                UpdateCellForIndex(firstCell, lastCell.index + 1);
+                firstCell.Top = lastCell.Bottom + new Vector2(0f, -spacingHeight);
+                cells.AddLast(firstCell);
+                cells.RemoveFirst();
+                firstCell = cells.First.Value;
+            }
+
+            FillVisibleRectWithCells();
+        }
+        else if (scrollDirection < 0)
+        {
+            CellItemWidget lastCell = cells.Last.Value;
+            while (lastCell.Top.y < visibleRect.y - visibleRect.height)
+            {
+                CellItemWidget firstCell = cells.First.Value;
+                UpdateCellForIndex(lastCell, firstCell.index - 1);
+                lastCell.Bottom = firstCell.Top + new Vector2(0f, spacingHeight);
+                cells.AddFirst(lastCell);
+                cells.RemoveLast();
+                lastCell = cells.Last.Value;
+            }
+        }
+    }
+
+    private void UpdateCellForIndex(CellItemWidget cell, int index)
+    {
+        cell.index = index;
+        cell.name = index.ToString();
+
+        if (cell.index >= 0 && cell.index <= dataList.Count - 1)
+        {
+            cell.gameObject.SetActive(true);
+            //更新数据 cell.UpdateContent
+            onUpdateCellData(cell.gameObject, dataList[cell.index], cell.index);
+            cell.Height = CellHeightAtIndex(cell.index);
+        }
+        else
+            cell.gameObject.SetActive(false);
+    }
+
+    private Dictionary<int, float> m_cellHeightDict = new Dictionary<int, float>();
+    public void SetCellHeightAtIndex(int index, float height)
+    {
+        m_cellHeightDict[index] = height;
+        //UpdateContentSize();
+    }
+
+    private float CellHeightAtIndex(int index)
+    {
+        //TODO
+        if (m_cellHeightDict.ContainsKey(index))
+            return m_cellHeightDict[index];
+        else
+            return 600f;
+    }
+
+    private void FillVisibleRectWithCells()
+    {
+        if (cells.Count < 1)
+            return;
+
+        CellItemWidget lastCell = cells.Last.Value;
+        int nextCellIndex = lastCell.index + 1;
+        Vector2 nextCellTop = lastCell.Bottom + new Vector2(0f, -spacingHeight);
+
+        while (nextCellIndex < dataList.Count && nextCellTop.y >= visibleRect.y - visibleRect.height)
+        {
+            CellItemWidget cell = CreateCellForIndex(nextCellIndex);
+            cell.Top = nextCellTop;
+
+            lastCell = cell;
+            nextCellIndex = lastCell.index + 1;
+            nextCellTop = lastCell.Bottom + new Vector2(0f, -spacingHeight);
+        }
+    }
+
+    private CellItemWidget CreateCellForIndex(int index)
+    {
+        GameObject obj = Instantiate(m_cellBase.gameObject) as GameObject;
+        CellItemWidget cell = obj.GetComponent<CellItemWidget>();
+
+        Vector3 scale = cell.transform.localScale;
+        Vector2 sizeDelta = cell.rt.sizeDelta;
+        Vector2 offsetMin = cell.rt.offsetMin;
+        Vector2 offsetMax = cell.rt.offsetMax;
+
+        cell.transform.SetParent(m_cellBase.transform.parent);
+
+        cell.transform.localScale = scale;
+        cell.rt.sizeDelta = sizeDelta;
+        cell.rt.offsetMin = offsetMin;
+        cell.rt.offsetMax = offsetMax;
+
+        UpdateCellForIndex(cell, index);
+
+        cells.AddLast(cell);
+
+        return cell;
+    }
+
+    public void SetCellData(List<object> p_dataList, Action<GameObject, object, int> p_onUpdateCellData)
+    {
+        dataList.Clear();
+        
+        for (int i = 0; i < p_dataList.Count; ++i)
+        {
+            object obj = p_dataList[i] as object;
+            dataList.Add(obj);
+        }
+
+        onUpdateCellData = p_onUpdateCellData;
+
+        //这里必须执行2次UpdateContent();
+        UpdateContent();
+        UpdateContent();
+    }
+
+    private void UpdateContent()
+    {
+        UpdateContentSize();
+        UpdateVisibleRect();
+
+        if (cells.Count < 1)
+        {
+            Vector2 cellTop = new Vector2(0, -padding.top);
+            for (int i = 0, count = dataList.Count; i < count; ++i)
+            {
+                float cellHeight = CellHeightAtIndex(i);
+                Vector2 cellBottom = cellTop + new Vector2(0, -cellHeight);
+                if ((cellTop.y <= visibleRect.y && cellTop.y >= visibleRect.y - visibleRect.height) ||
+                    (cellBottom.y <= visibleRect.y && cellBottom.y >= visibleRect.y - visibleRect.height))
+                {
+                    CellItemWidget cell = CreateCellForIndex(i);
+                    cell.Top = cellTop;
+                    break;
+                }
+                cellTop = cellBottom + new Vector2(0f, spacingHeight);
+            }
+
+            FillVisibleRectWithCells();
+        }
+        else
+        {
+            LinkedListNode<CellItemWidget> node = cells.First;
+            UpdateCellForIndex(node.Value, node.Value.index);
+            node = node.Next;
+
+            while (node != null)
+            {
+                UpdateCellForIndex(node.Value, node.Previous.Value.index + 1);
+                node.Value.Top = node.Previous.Value.Bottom + new Vector2(0, -spacingHeight);
+                node = node.Next;
+            }
+
+            FillVisibleRectWithCells();
+        }
+    }
+
+    private void UpdateContentSize()
+    {
+        float contentHeight = 0f;
+        for (int i = 0, count = dataList.Count; i < count; ++i)
+        {
+            contentHeight += CellHeightAtIndex(i);
+            if (i > 0)
+                contentHeight += spacingHeight;
+        }
+
+        Vector2 sizeDelta = contentRT.sizeDelta;
+        sizeDelta.y = padding.top + contentHeight + padding.bottom;
+        if (sizeDelta.y < scrollRT.sizeDelta.y)
+            sizeDelta.y = scrollRT.sizeDelta.y;
+        contentRT.sizeDelta = sizeDelta;
+    }
+}

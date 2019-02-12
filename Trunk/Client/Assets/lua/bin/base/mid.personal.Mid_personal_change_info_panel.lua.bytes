@@ -1,0 +1,76 @@
+local EmptyImageWidget=CS.EmptyImageWidget
+local CellGroupWidget=CS.CellGroupWidget
+local ImageWidget=CS.ImageWidget
+local TextWidget=CS.TextWidget
+local CircleImageWidget=CS.CircleImageWidget
+local PanelWidget=CS.PanelWidget
+local IconWidget=CS.IconWidget
+
+Mid_personal_change_info_panel={}
+local this = Mid_personal_change_info_panel
+
+function this:new(gameObject)
+	local o = { }
+	setmetatable(o, self)
+	self.__index = self
+	o:init(gameObject)
+	return o
+end
+
+this.go = nil
+this.back_Image=nil
+this.change_CellGroup=nil
+this.set_Image=nil
+this.pic_CellGroup=nil
+this.add_Image=nil
+--ChangeCell数组
+this.changeCellArr={}
+--Piccell数组
+this.piccellArr={}
+
+function this:init(gameObject)
+	self.go=gameObject
+	self.back_Image=self.go.transform:Find("back_Image/back_Image"):GetComponent(typeof(EmptyImageWidget))
+	self.change_CellGroup=self.go.transform:Find("change_CellGroup"):GetComponent(typeof(CellGroupWidget))
+	self.set_Image=self.go.transform:Find("Image/set_Image"):GetComponent(typeof(EmptyImageWidget))
+	self.pic_CellGroup=self.go.transform:Find("panel/pic_CellGroup"):GetComponent(typeof(CellGroupWidget))
+	self.add_Image=self.go.transform:Find("panel/add_Image"):GetComponent(typeof(ImageWidget))
+	self.changeCellArr={}
+	table.insert(self.changeCellArr,self.new_ChangeCell(self.go.transform:Find("change_CellGroup/cellitem").gameObject))
+	table.insert(self.changeCellArr,self.new_ChangeCell(self.go.transform:Find("change_CellGroup/cellitem_1").gameObject))
+	table.insert(self.changeCellArr,self.new_ChangeCell(self.go.transform:Find("change_CellGroup/cellitem_2").gameObject))
+	table.insert(self.changeCellArr,self.new_ChangeCell(self.go.transform:Find("change_CellGroup/cellitem_3").gameObject))
+	table.insert(self.changeCellArr,self.new_ChangeCell(self.go.transform:Find("change_CellGroup/cellitem_4").gameObject))
+	table.insert(self.changeCellArr,self.new_ChangeCell(self.go.transform:Find("change_CellGroup/cellitem_5").gameObject))
+	self.piccellArr={}
+	table.insert(self.piccellArr,self.new_Piccell(self.go.transform:Find("panel/pic_CellGroup/cellitem").gameObject))
+	table.insert(self.piccellArr,self.new_Piccell(self.go.transform:Find("panel/pic_CellGroup/cellitem_1").gameObject))
+	table.insert(self.piccellArr,self.new_Piccell(self.go.transform:Find("panel/pic_CellGroup/cellitem_2").gameObject))
+	table.insert(self.piccellArr,self.new_Piccell(self.go.transform:Find("panel/pic_CellGroup/cellitem_3").gameObject))
+	table.insert(self.piccellArr,self.new_Piccell(self.go.transform:Find("panel/pic_CellGroup/cellitem_4").gameObject))
+end
+
+--ChangeCell复用单元
+function this.new_ChangeCell(itemGo)
+	local item = { }
+	item.go = itemGo
+	item.press_Image=itemGo.transform:Find("press_Image"):GetComponent(typeof(ImageWidget))
+	item.type_Text=itemGo.transform:Find("type_Text"):GetComponent(typeof(TextWidget))
+	item.head_CircleImage=itemGo.transform:Find("head_CircleImage"):GetComponent(typeof(CircleImageWidget))
+	item.change_Image=itemGo.transform:Find("change_Image"):GetComponent(typeof(ImageWidget))
+	item.desc_Text=itemGo.transform:Find("desc_Text"):GetComponent(typeof(TextWidget))
+	item.sex_Panel=itemGo.transform:Find("sex_Panel"):GetComponent(typeof(PanelWidget))
+	item.sex_bg_Icon=itemGo.transform:Find("sex_Panel/sex_bg_Icon"):GetComponent(typeof(IconWidget))
+	item.sex_Icon=itemGo.transform:Find("sex_Panel/sex_Icon"):GetComponent(typeof(IconWidget))
+	item.hornor_Panel=itemGo.transform:Find("hornor_Panel"):GetComponent(typeof(PanelWidget))
+	return item
+end
+--Piccell复用单元
+function this.new_Piccell(itemGo)
+	local item = { }
+	item.go = itemGo
+	item.item_Image=itemGo.transform:Find("item_Image"):GetComponent(typeof(ImageWidget))
+	item.more_Image=itemGo.transform:Find("more_Image"):GetComponent(typeof(ImageWidget))
+	return item
+end
+

@@ -1,0 +1,250 @@
+fileFormatVersion: 2
+guid: 9a82b20f4282d694787bd1db58409e12
+timeCreated: 1547189075
+licenseType: Free
+ModelImporter:
+  serializedVersion: 19
+  fileIDToRecycleName:
+    100000: ball
+    100002: ball 1
+    100004: //RootNode
+    100006: ball_bottle
+    100008: ball_bottle001
+    100010: ball_bottle002
+    100012: ball_bottle003
+    100014: ball_bottle004
+    100016: ball_bottle005
+    100018: ball_bottle006
+    100020: ball_bottle007
+    100022: ball_bottle008
+    100024: ball_bottle009
+    100026: Box001
+    100028: Box004
+    100030: Box006
+    100032: "\u5BF9\u8C61001"
+    100034: "\u5BF9\u8C61008"
+    100036: "\u5BF9\u8C61009"
+    100038: "\u5BF9\u8C61010"
+    100040: "\u5BF9\u8C61011"
+    100042: baipingqi
+    100044: bj
+    100046: map
+    100048: sadao_001
+    100050: saidao_003
+    100052: saitai
+    100054: sanjiaojia
+    100056: saodao_002
+    100058: guanggaolan
+    100060: saidao_008
+    100062: saidao_009
+    100064: changjing
+    100066: bowling
+    100068: saidao_001
+    100070: saidao_002
+    400000: ball
+    400002: ball 1
+    400004: //RootNode
+    400006: ball_bottle
+    400008: ball_bottle001
+    400010: ball_bottle002
+    400012: ball_bottle003
+    400014: ball_bottle004
+    400016: ball_bottle005
+    400018: ball_bottle006
+    400020: ball_bottle007
+    400022: ball_bottle008
+    400024: ball_bottle009
+    400026: Box001
+    400028: Box004
+    400030: Box006
+    400032: "\u5BF9\u8C61001"
+    400034: "\u5BF9\u8C61008"
+    400036: "\u5BF9\u8C61009"
+    400038: "\u5BF9\u8C61010"
+    400040: "\u5BF9\u8C61011"
+    400042: baipingqi
+    400044: bj
+    400046: map
+    400048: sadao_001
+    400050: saidao_003
+    400052: saitai
+    400054: sanjiaojia
+    400056: saodao_002
+    400058: guanggaolan
+    400060: saidao_008
+    400062: saidao_009
+    400064: changjing
+    400066: bowling
+    400068: saidao_001
+    400070: saidao_002
+    2300000: ball
+    2300002: ball_bottle
+    2300004: ball_bottle001
+    2300006: ball_bottle002
+    2300008: ball_bottle003
+    2300010: ball_bottle004
+    2300012: ball_bottle005
+    2300014: ball_bottle006
+    2300016: ball_bottle007
+    2300018: ball_bottle008
+    2300020: ball_bottle009
+    2300022: Box001
+    2300024: Box004
+    2300026: Box006
+    2300028: "\u5BF9\u8C61001"
+    2300030: "\u5BF9\u8C61008"
+    2300032: "\u5BF9\u8C61009"
+    2300034: "\u5BF9\u8C61010"
+    2300036: "\u5BF9\u8C61011"
+    2300038: baipingqi
+    2300040: bj
+    2300042: map
+    2300044: sadao_001
+    2300046: saidao_003
+    2300048: saitai
+    2300050: sanjiaojia
+    2300052: saodao_002
+    2300054: guanggaolan
+    2300056: saidao_008
+    2300058: saidao_009
+    2300060: bowling
+    2300062: saidao_001
+    2300064: saidao_002
+    3300000: ball
+    3300002: ball_bottle
+    3300004: ball_bottle001
+    3300006: ball_bottle002
+    3300008: ball_bottle003
+    3300010: ball_bottle004
+    3300012: ball_bottle005
+    3300014: ball_bottle006
+    3300016: ball_bottle007
+    3300018: ball_bottle008
+    3300020: ball_bottle009
+    3300022: Box001
+    3300024: Box004
+    3300026: Box006
+    3300028: "\u5BF9\u8C61001"
+    3300030: "\u5BF9\u8C61008"
+    3300032: "\u5BF9\u8C61009"
+    3300034: "\u5BF9\u8C61010"
+    3300036: "\u5BF9\u8C61011"
+    3300038: baipingqi
+    3300040: bj
+    3300042: map
+    3300044: sadao_001
+    3300046: saidao_003
+    3300048: saitai
+    3300050: sanjiaojia
+    3300052: saodao_002
+    3300054: guanggaolan
+    3300056: saidao_008
+    3300058: saidao_009
+    3300060: bowling
+    3300062: saidao_001
+    3300064: saidao_002
+    4300000: ball
+    4300002: Box001
+    4300004: "\u5BF9\u8C61001"
+    4300006: Box004
+    4300008: ball_bottle007
+    4300010: ball_bottle
+    4300012: ball_bottle008
+    4300014: ball_bottle005
+    4300016: ball_bottle004
+    4300018: ball_bottle003
+    4300020: ball_bottle001
+    4300022: ball_bottle009
+    4300024: ball_bottle006
+    4300026: ball_bottle002
+    4300028: "\u5BF9\u8C61008"
+    4300030: "\u5BF9\u8C61009"
+    4300032: "\u5BF9\u8C61010"
+    4300034: Box006
+    4300036: "\u5BF9\u8C61011"
+    4300038: saidao_003
+    4300040: saodao_002
+    4300042: sanjiaojia
+    4300044: bj
+    4300046: baipingqi
+    4300048: saitai
+    4300050: sadao_001
+    4300052: map
+    4300054: guanggaolan
+    4300056: saidao_008
+    4300058: saidao_009
+    4300060: saidao_001
+    4300062: bowling
+    4300064: saidao_002
+    7400000: Take 001
+    9500000: //RootNode
+  materials:
+    importMaterials: 1
+    materialName: 0
+    materialSearch: 1
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    resampleCurves: 1
+    optimizeGameObjects: 0
+    motionNodeName: 
+    rigImportErrors: 
+    rigImportWarnings: 
+    animationImportErrors: 
+    animationImportWarnings: 
+    animationRetargetingWarnings: 
+    animationDoRetargetingWarnings: 0
+    animationCompression: 1
+    animationRotationError: 0.5
+    animationPositionError: 0.5
+    animationScaleError: 0.5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    clipAnimations: []
+    isReadable: 1
+  meshes:
+    lODScreenPercentages: []
+    globalScale: 1
+    meshCompression: 0
+    addColliders: 0
+    importBlendShapes: 1
+    swapUVChannels: 0
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    optimizeMeshForGPU: 1
+    keepQuads: 0
+    weldVertices: 1
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVPackMargin: 4
+    useFileScale: 1
+  tangentSpace:
+    normalSmoothAngle: 60
+    normalImportMode: 0
+    tangentImportMode: 3
+  importAnimation: 1
+  copyAvatar: 0
+  humanDescription:
+    serializedVersion: 2
+    human: []
+    skeleton: []
+    armTwist: 0.5
+    foreArmTwist: 0.5
+    upperLegTwist: 0.5
+    legTwist: 0.5
+    armStretch: 0.05
+    legStretch: 0.05
+    feetSpacing: 0
+    rootMotionBoneName: 
+    rootMotionBoneRotation: {x: 0, y: 0, z: 0, w: 1}
+    hasTranslationDoF: 0
+    hasExtraRoot: 0
+    skeletonHasParents: 1
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  animationType: 2
+  humanoidOversampling: 1
+  additionalBone: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
