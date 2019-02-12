@@ -81,7 +81,7 @@ public class Driver : MonoBehaviour
 #else
         CommonPathUtils.platformStr = "PC";
 #endif
-        CommonPathUtils.isLoadEditorRes = false ;
+        CommonPathUtils.isLoadEditorRes = true ;
 
         //iOS输入框特殊处理
         InputFieldWidget.onSelect = () =>
